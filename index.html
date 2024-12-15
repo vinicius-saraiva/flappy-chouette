@@ -137,10 +137,17 @@
 
         // Initialize when page loads
         window.onload = async () => {
+            // Update leaderboard immediately
+            await updateLeaderboard();
+            
+            // Then initialize Auth0
             await initializeAuth0();
+            
+            // Set up periodic leaderboard updates
+            setInterval(updateLeaderboard, 30000); // Update every 30 seconds
         };
 
-        // Your existing updateLeaderboard function
+        // Update the updateLeaderboard function
         async function updateLeaderboard() {
             try {
                 const { data: scores, error } = await supabaseClient
@@ -157,6 +164,12 @@
                 console.log('Leaderboard data:', scores);
 
                 const leaderboardList = document.getElementById('leaderboardList');
+                
+                if (!scores || scores.length === 0) {
+                    leaderboardList.innerHTML = '<li>No scores yet - Be the first!</li>';
+                    return;
+                }
+
                 leaderboardList.innerHTML = scores.map((entry, index) => `
                     <li class="score-item">
                         <span class="rank">${index + 1}</span>
