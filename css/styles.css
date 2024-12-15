@@ -1,0 +1,185 @@
+body {
+    background-color: #71c5cf;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.logo {
+    width: 100%;
+    max-width: 400px;
+    margin: 20px auto;
+    display: block;
+}
+
+.countdown {
+    text-align: center;
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    color: white;
+}
+
+.countdown h2 {
+    margin-bottom: 15px;
+    color: #FFD700;
+}
+
+#timer {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #fff;
+}
+
+.leaderboard {
+    margin: 20px 0;
+    padding: 20px;
+    background: #fff;
+    border-radius: 5px;
+}
+
+.leaderboard h2 {
+    color: #333;
+    margin-top: 0;
+}
+
+.score-list {
+    list-style: none;
+    padding: 0;
+}
+
+.score-list li {
+    padding: 10px;
+    margin: 5px 0;
+    background: #f5f5f5;
+    border-radius: 3px;
+}
+
+.auth-section {
+    margin: 20px 0;
+    text-align: center;
+}
+
+input[type="text"] {
+    padding: 10px;
+    margin: 10px;
+    width: 200px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 3px;
+    background: #4a90e2;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #357abd;
+}
+
+.error-message {
+    color: red;
+    margin: 10px 0;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#startGameBtn {
+    background-color: #4CAF50; /* Green */
+    margin: 0 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#startGameBtn:hover {
+    background-color: #45a049;
+}
+
+.score-item {
+    display: grid;
+    grid-template-columns: 40px 1fr 80px;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    margin: 5px 0;
+    border-radius: 5px;
+    transition: transform 0.2s;
+}
+
+.score-item:hover {
+    transform: scale(1.02);
+}
+
+.rank {
+    font-weight: bold;
+    color: #4a90e2;
+}
+
+.score {
+    font-weight: bold;
+    text-align: right;
+}
+
+.score-item:nth-child(1) {
+    background: linear-gradient(to right, #ffd700, rgba(255, 215, 0, 0.7));
+}
+
+.score-item:nth-child(2) {
+    background: linear-gradient(to right, #c0c0c0, rgba(192, 192, 192, 0.7));
+}
+
+.score-item:nth-child(3) {
+    background: linear-gradient(to right, #cd7f32, rgba(205, 127, 50, 0.7));
+}
+
+.button-container {
+    text-align: center;
+    margin: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.countdown-number {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 5px;
+    background: #FFD700;
+    color: black;
+    border-radius: 5px;
+    min-width: 30px;
+}

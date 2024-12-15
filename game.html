@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flappy Owl - Game</title>
+<script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/phaser.min.js"></script>
+</head>
+<body>
+<div id="game"></div>
+
+<div style="position: fixed; top: 10px; left: 10px;">
+    <button onclick="window.location.href='index.html'" style="padding: 10px; cursor: pointer;">
+        Home
+    </button>
+</div>
+
+<script>
+	// Initialize Supabase
+	const supabaseClient = supabase.createClient(
+		'https://jkvwfawlgpxtvtxjlsjr.supabase.co',
+		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprdndmYXdsZ3B4dHZ0eGpsc2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQyMjE3MjMsImV4cCI6MjA0OTc5NzcyM30.yKURsZiOq3Vz71Om4xtnpK3xNHHnCnJAYdmExFzfYFI'
+	);
+
+	// Check authentication
+	function checkAuth() {
+		console.log("Checking authentication...");
+		
+		const isAuthenticated = localStorage.getItem('isAuthenticated');
+		const authToken = localStorage.getItem('authToken');
+		const username = localStorage.getItem('username');
+		const userId = localStorage.getItem('userId');
+		
+		console.log("Local storage check:", {
+			isAuthenticated,
+			hasToken: !!authToken,
+			hasUsername: !!username,
+			hasUserId: !!userId
+		});
+		
+		if (!isAuthenticated || !authToken || !username || !userId) {
+			console.log("Authentication failed, redirecting to login...");
+			window.location.href = 'index.html';
+			return false;
+		}
+		
+		console.log("Authentication successful, loading game...");
+		return true;
+	}
+
+	// Only load game if authenticated
+	window.onload = function() {
+		if (checkAuth()) {
+			// Load game script
+			const gameScript = document.createElement('script');
+			gameScript.src = 'js/game.js';
+			document.body.appendChild(gameScript);
+		}
+	};
+</script>
+</body>
+</html>

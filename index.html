@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Owl - Welcome</title>
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <img src="assets/title.png" alt="Flappy Owl" class="logo">
+
+        <div class="countdown">
+            <h2>Le vrai maitre de la Chouette sera proclamé dans...</h2>
+            <div id="timer">Loading...</div>
+        </div>
+
+        <div class="leaderboard">
+            <h2>Leaderboard</h2>
+            <ul class="score-list" id="leaderboardList">
+                <li>No scores yet - Be the first!</li>
+            </ul>
+        </div>
+
+        <div class="auth-section">
+            <button id="loginBtn" onclick="handleLogin()">Login</button>
+            <button id="startGameBtn" onclick="startGame()" style="display: none;">Start Game</button>
+            <button id="logoutBtn" onclick="handleLogout()" style="display: none;">Logout</button>
+            <div id="errorMessage" class="error-message"></div>
+        </div>
+    </div>
+
+    <script>
+        let auth0Client = null;
+
+        // Initialize Supabase
+        const supabaseClient = supabase.createClient(
+            'https://jkvwfawlgpxtvtxjlsjr.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprdndmYXdsZ3B4dHZ0eGpsc2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQyMjE3MjMsImV4cCI6MjA0OTc5NzcyM30.yKURsZiOq3Vz71Om4xtnpK3xNHHnCnJAYdmExFzfYFI'
+        );
+
+        // Auth0 initialization
+        async function initializeAuth0() {
+            try {
+                auth0Client = await auth0.createAuth0Client({
+                    domain: 'dev-3pccfsjlqjo7mr0a.us.auth0.com',
+                    clientId: 'aJBqpDGdYlRgqOkgO09baUMqNRPAnKsY',
+                    authorizationParams: {
+                        redirect_uri: window.location.origin
+                    }
+                });
+
+                // Check for the code and state parameters
+                const query = window.location.search;
+                if (query.includes("code=") && query.includes("state=")) {
+                    await auth0Client.handleRedirectCallback();
+                    window.history.replaceState({}, document.title, "/");
+                }
+
+                await updateUI();
+            } catch (error) {
+                console.error("Auth0 initialization error:", error);
+            }
+        }
+
+        // Login handler
+        async function handleLogin() {
+            try {
+                await auth0Client.loginWithRedirect();
+            } catch (error) {
+                console.error("Login error:", error);
+            }
+        }
+
+        // Logout handler
+        async function handleLogout() {
+            try {
+                await auth0Client.logout({
+                    returnTo: window.location.origin
+                });
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+        }
+
+        // Update UI based on authentication state
+        async function updateUI() {
+            try {
+                const isAuthenticated = await auth0Client.isAuthenticated();
+                const loginBtn = document.getElementById('loginBtn');
+                const startGameBtn = document.getElementById('startGameBtn');
+                
+                if (isAuthenticated) {
+                    const user = await auth0Client.getUser();
+                    const token = await auth0Client.getTokenSilently();
+                    
+                    loginBtn.textContent = 'Logout';
+                    loginBtn.onclick = handleLogout;
+                    
+                    // Store user info and token
+                    localStorage.setItem('isAuthenticated', 'true');
+                    localStorage.setItem('username', user.name || user.email);
+                    localStorage.setItem('userId', user.sub);
+                    localStorage.setItem('authToken', token);
+                    
+                    // Show start game button
+                    startGameBtn.style.display = 'inline-block';
+                    
+                    // Update leaderboard
+                    updateLeaderboard();
+                } else {
+                    loginBtn.textContent = 'Login';
+                    loginBtn.onclick = handleLogin;
+                    startGameBtn.style.display = 'none';
+                    localStorage.clear();
+                }
+            } catch (error) {
+                console.error("UI update error:", error);
+            }
+        }
+
+        // Initialize when page loads
+        window.onload = async () => {
+            await initializeAuth0();
+        };
+
+        // Your existing updateLeaderboard function
+        async function updateLeaderboard() {
+            try {
+                const { data: scores, error } = await supabaseClient
+                    .from('scores')
+                    .select('username, score, created_at')
+                    .order('score', { ascending: false })
+                    .limit(5);
+
+                if (error) {
+                    console.error('Supabase error:', error);
+                    return;
+                }
+
+                console.log('Leaderboard data:', scores);
+
+                const leaderboardList = document.getElementById('leaderboardList');
+                leaderboardList.innerHTML = scores.map((entry, index) => `
+                    <li class="score-item">
+                        <span class="rank">${index + 1}</span>
+                        <span class="username">${entry.username}</span>
+                        <span class="score">${entry.score}</span>
+                    </li>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching leaderboard:', error);
+            }
+        }
+
+        // Add startGame function
+        function startGame() {
+            window.location.href = 'game.html';
+        }
+
+        function updateCountdown() {
+            const targetDate = new Date('2024-12-20T14:00:00');
+            const now = new Date();
+            const difference = targetDate - now;
+
+            if (difference <= 0) {
+                document.getElementById('timer').innerHTML = "C'est l'heure!";
+                return;
+            }
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById('timer').innerHTML = `
+                <span class="countdown-number">${days}</span> jours 
+                <span class="countdown-number">${hours}</span> heures 
+                <span class="countdown-number">${minutes}</span> minutes 
+                <span class="countdown-number">${seconds}</span> secondes
+            `;
+        }
+
+        // Update the countdown every second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
