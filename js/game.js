@@ -1,10 +1,10 @@
 // At the start of game.js
-const baseUrl = window.location.origin;
-const isLocalhost = baseUrl.includes('localhost');
+// const baseUrl = window.location.origin;
+// const isLocalhost = baseUrl.includes('localhost');
 
 if (typeof supabaseClient === 'undefined') {
     console.error('Supabase client not initialized');
-    window.location.href = 'index.html';
+    window.location.href = window.baseUrl;
 }
 
 // Add at the start of game.js
@@ -16,7 +16,7 @@ function checkAuthentication() {
     
     if (!isAuthenticated || !authToken) {
         console.log("Game.js: No local auth found");
-        window.location.href = baseUrl;
+        window.location.href = window.baseUrl;
         return false;
     }
     

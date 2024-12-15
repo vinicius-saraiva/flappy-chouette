@@ -18,13 +18,12 @@
 </div>
 
 <script>
-	// Add this at the start
-	const baseUrl = window.location.origin;
-	const isLocalhost = baseUrl.includes('localhost');
+	// Define these variables in the global scope
+	window.baseUrl = window.location.origin;
+	window.isLocalhost = window.location.hostname === 'localhost';
 
-	// Update the home button
 	function goHome() {
-		window.location.href = `${baseUrl}/`;
+		window.location.href = window.baseUrl;
 	}
 
 	// Initialize Supabase
@@ -33,7 +32,6 @@
 		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprdndmYXdsZ3B4dHZ0eGpsc2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQyMjE3MjMsImV4cCI6MjA0OTc5NzcyM30.yKURsZiOq3Vz71Om4xtnpK3xNHHnCnJAYdmExFzfYFI'
 	);
 
-	// Check authentication
 	function checkAuth() {
 		console.log("Checking authentication...");
 		
@@ -44,17 +42,15 @@
 		
 		if (!isAuthenticated || !authToken || !username || !userId) {
 			console.log("Authentication failed, redirecting to home...");
-			window.location.href = baseUrl;
+			window.location.href = window.baseUrl;
 			return false;
 		}
 		
 		return true;
 	}
 
-	// Only load game if authenticated
 	window.onload = function() {
 		if (checkAuth()) {
-			// Load game script
 			const gameScript = document.createElement('script');
 			gameScript.src = 'js/game.js';
 			document.body.appendChild(gameScript);
