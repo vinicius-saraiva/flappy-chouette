@@ -91,19 +91,17 @@
         // Update the Logout handler
         async function handleLogout() {
             try {
-                const baseUrl = window.location.origin;
-                const allowedOrigins = [
-                    'http://localhost:3000',
-                    'https://flappychouette.fun'
-                ];
+                // Always use the production URL for logout
+                const returnTo = 'https://flappychouette.fun';
                 
-                // Use current origin if it's allowed, otherwise use production
-                const returnTo = allowedOrigins.includes(baseUrl) 
-                    ? baseUrl 
-                    : 'https://flappychouette.fun';
+                // Clear local storage before logout
+                localStorage.clear();
 
+                // Perform the logout
                 await auth0Client.logout({
-                    returnTo: returnTo
+                    logoutParams: {
+                        returnTo: returnTo
+                    }
                 });
             } catch (error) {
                 console.error("Logout error:", error);
