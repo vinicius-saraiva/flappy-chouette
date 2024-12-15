@@ -44,11 +44,25 @@
         // Auth0 initialization
         async function initializeAuth0() {
             try {
+                const baseUrl = window.location.origin;
+                console.log('Base URL:', baseUrl);
+                
+                // List of allowed origins
+                const allowedOrigins = [
+                    'http://localhost:3000',
+                    'https://flappychouette.fun'
+                ];
+                
+                // Use current origin if it's allowed, otherwise use production
+                const redirectUri = allowedOrigins.includes(baseUrl) 
+                    ? baseUrl 
+                    : 'https://flappychouette.fun';
+
                 auth0Client = await auth0.createAuth0Client({
                     domain: 'dev-3pccfsjlqjo7mr0a.us.auth0.com',
                     clientId: 'aJBqpDGdYlRgqOkgO09baUMqNRPAnKsY',
                     authorizationParams: {
-                        redirect_uri: window.location.origin
+                        redirect_uri: redirectUri
                     }
                 });
 
@@ -157,11 +171,12 @@
 
         // Add startGame function
         function startGame() {
-            window.location.href = 'game.html';
+            const baseUrl = window.location.origin;
+            window.location.href = `${baseUrl}/game.html`;
         }
 
         function updateCountdown() {
-            const targetDate = new Date('2024-12-20T14:00:00');
+            const targetDate = new Date('2023-12-19T14:00:00');
             const now = new Date();
             const difference = targetDate - now;
 

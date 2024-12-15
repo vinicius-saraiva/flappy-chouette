@@ -12,12 +12,21 @@
 <div id="game"></div>
 
 <div style="position: fixed; top: 10px; left: 10px;">
-    <button onclick="window.location.href='index.html'" style="padding: 10px; cursor: pointer;">
+    <button onclick="goHome()" style="padding: 10px; cursor: pointer;">
         Home
     </button>
 </div>
 
 <script>
+	// Add this at the start
+	const baseUrl = window.location.origin;
+	const isLocalhost = baseUrl.includes('localhost');
+
+	// Update the home button
+	function goHome() {
+		window.location.href = `${baseUrl}/`;
+	}
+
 	// Initialize Supabase
 	const supabaseClient = supabase.createClient(
 		'https://jkvwfawlgpxtvtxjlsjr.supabase.co',
@@ -33,20 +42,12 @@
 		const username = localStorage.getItem('username');
 		const userId = localStorage.getItem('userId');
 		
-		console.log("Local storage check:", {
-			isAuthenticated,
-			hasToken: !!authToken,
-			hasUsername: !!username,
-			hasUserId: !!userId
-		});
-		
 		if (!isAuthenticated || !authToken || !username || !userId) {
-			console.log("Authentication failed, redirecting to login...");
-			window.location.href = 'index.html';
+			console.log("Authentication failed, redirecting to home...");
+			window.location.href = baseUrl;
 			return false;
 		}
 		
-		console.log("Authentication successful, loading game...");
 		return true;
 	}
 
