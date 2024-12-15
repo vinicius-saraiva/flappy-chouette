@@ -88,11 +88,22 @@
             }
         }
 
-        // Logout handler
+        // Update the Logout handler
         async function handleLogout() {
             try {
+                const baseUrl = window.location.origin;
+                const allowedOrigins = [
+                    'http://localhost:3000',
+                    'https://flappychouette.fun'
+                ];
+                
+                // Use current origin if it's allowed, otherwise use production
+                const returnTo = allowedOrigins.includes(baseUrl) 
+                    ? baseUrl 
+                    : 'https://flappychouette.fun';
+
                 await auth0Client.logout({
-                    returnTo: window.location.origin
+                    returnTo: returnTo
                 });
             } catch (error) {
                 console.error("Logout error:", error);
