@@ -138,7 +138,7 @@ game.States.play = {
 			pipe.body.velocity.x = 0;
 		}, this);
 		this.bird.animations.stop('fly', 0);
-		game.input.onDown.remove(this.fly,this);
+		game.input.onDown.remove(this.fly, this);
 		game.time.events.stop(true);
 	},
 
@@ -166,11 +166,11 @@ game.States.play = {
 		
 		this.gameIsOver = true;
 		
-		// First stop the game
-		this.stopGame();
-		
-		// Then show game over text and save score
+		// First show game over text
 		this.showGameOverText();
+		
+		// Then stop game and save score
+		this.stopGame();
 		this.saveScore(this.score);
 	},
 
@@ -213,18 +213,27 @@ game.States.play = {
 	showGameOverText: function(){
 		this.scoreText.destroy();
 		game.bestScore = game.bestScore || 0;
-		if(this.score > game.bestScore) game.bestScore = this.score; //最好分数
-		this.gameOverGroup = game.add.group(); //添加一个组
-		var gameOverText = this.gameOverGroup.create(game.width/2,0,'game_over'); //game over 文字图片
-		var scoreboard = this.gameOverGroup.create(game.width/2,70,'score_board'); //分数板
-		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup); //当前分数
-		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup); //最好分数
-		var replayBtn = game.add.button(game.width/2, 210, 'btn', function(){//重玩按钮
+		if(this.score > game.bestScore) game.bestScore = this.score;
+		
+		this.gameOverGroup = game.add.group();
+		
+		// Add game over elements to group
+		var gameOverText = this.gameOverGroup.create(game.width/2, 0, 'game_over');
+		var scoreboard = this.gameOverGroup.create(game.width/2, 70, 'score_board');
+		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup);
+		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup);
+		
+		// Add replay button
+		var replayBtn = game.add.button(game.width/2, 210, 'btn', function(){
 			game.state.start('play');
 		}, this, null, null, null, null, this.gameOverGroup);
+		
+		// Set anchors
 		gameOverText.anchor.setTo(0.5, 0);
 		scoreboard.anchor.setTo(0.5, 0);
 		replayBtn.anchor.setTo(0.5, 0);
+		
+		// Position the group
 		this.gameOverGroup.y = 30;
 	},
 
