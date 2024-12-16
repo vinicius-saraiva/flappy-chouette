@@ -151,7 +151,7 @@ game.States.play = {
 	hitPipe: function() {
 		if(this.gameIsOver) return;
 		this.soundHitPipe.play();
-		this.gameOver();
+		this.gameOver(true);
 	},
 
 	hitGround: function() {
@@ -165,12 +165,13 @@ game.States.play = {
 		if (this.gameIsOver) return;
 		
 		this.gameIsOver = true;
+		
+		// Show game over text first
+		this.showGameOverText();
+		
+		// Then stop game and save score
 		this.stopGame();
-		
-		// Save score
 		this.saveScore(this.score);
-		
-		if(show_text) this.showGameOverText();
 	},
 
 	saveScore: function(score) {
