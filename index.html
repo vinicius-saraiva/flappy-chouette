@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flappy Owl - Welcome</title>
-    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -25,138 +24,89 @@
         </div>
 
         <div class="auth-section">
-            <button id="loginBtn" onclick="handleLogin()">Login</button>
-            <button id="startGameBtn" onclick="startGame()" style="display: none;">Start Game</button>
-            <button id="logoutBtn" onclick="handleLogout()" style="display: none;">Logout</button>
+            <div class="username-input">
+                <input type="text" 
+                       id="usernameInput" 
+                       placeholder="Enter your username (3-20 characters)"
+                       minlength="3" 
+                       maxlength="20">
+            </div>
+            <button id="playButton" disabled onclick="handlePlay()">Play Game</button>
             <div id="errorMessage" class="error-message"></div>
         </div>
     </div>
 
     <script>
-        let auth0Client = null;
-
         // Initialize Supabase
         const supabaseClient = supabase.createClient(
             'https://jkvwfawlgpxtvtxjlsjr.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprdndmYXdsZ3B4dHZ0eGpsc2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQyMjE3MjMsImV4cCI6MjA0OTc5NzcyM30.yKURsZiOq3Vz71Om4xtnpK3xNHHnCnJAYdmExFzfYFI'
         );
 
-        // Auth0 initialization
-        async function initializeAuth0() {
-            try {
-                const baseUrl = window.location.origin;
-                console.log('Base URL:', baseUrl);
-                
-                // List of allowed origins
-                const allowedOrigins = [
-                    'http://localhost:3000',
-                    'https://flappychouette.fun'
-                ];
-                
-                // Use current origin if it's allowed, otherwise use production
-                const redirectUri = allowedOrigins.includes(baseUrl) 
-                    ? baseUrl 
-                    : 'https://flappychouette.fun';
-
-                auth0Client = await auth0.createAuth0Client({
-                    domain: 'login.flappychouette.fun',
-                    clientId: 'aJBqpDGdYlRgqOkgO09baUMqNRPAnKsY',
-                    authorizationParams: {
-                        redirect_uri: redirectUri
-                    }
-                });
-
-                // Check for the code and state parameters
-                const query = window.location.search;
-                if (query.includes("code=") && query.includes("state=")) {
-                    await auth0Client.handleRedirectCallback();
-                    window.history.replaceState({}, document.title, "/");
-                }
-
-                await updateUI();
-            } catch (error) {
-                console.error("Auth0 initialization error:", error);
-            }
+        // Generate UUID function
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0,
+                    v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
         }
 
-        // Login handler
-        async function handleLogin() {
-            try {
-                await auth0Client.loginWithRedirect();
-            } catch (error) {
-                console.error("Login error:", error);
-            }
+        // Username validation
+        function validateUsername(username) {
+            return username && username.length >= 3 && username.length <= 20;
         }
 
-        // Update the Logout handler
-        async function handleLogout() {
-            try {
-                // Always use the production URL for logout
-                const returnTo = 'https://flappychouette.fun';
-                
-                // Clear local storage before logout
-                localStorage.clear();
+        // Handle username input
+        const usernameInput = document.getElementById('usernameInput');
+        const playButton = document.getElementById('playButton');
+        const errorMessage = document.getElementById('errorMessage');
 
-                // Perform the logout
-                await auth0Client.logout({
-                    logoutParams: {
-                        returnTo: returnTo
-                    }
-                });
-            } catch (error) {
-                console.error("Logout error:", error);
-            }
-        }
+        usernameInput.addEventListener('input', function() {
+            const username = this.value.trim();
+            playButton.disabled = !validateUsername(username);
+            errorMessage.textContent = '';
+        });
 
-        // Update UI based on authentication state
-        async function updateUI() {
-            try {
-                const isAuthenticated = await auth0Client.isAuthenticated();
-                const loginBtn = document.getElementById('loginBtn');
-                const startGameBtn = document.getElementById('startGameBtn');
-                
-                if (isAuthenticated) {
-                    const user = await auth0Client.getUser();
-                    const token = await auth0Client.getTokenSilently();
-                    
-                    loginBtn.textContent = 'Logout';
-                    loginBtn.onclick = handleLogout;
-                    
-                    // Store user info and token
-                    localStorage.setItem('isAuthenticated', 'true');
-                    localStorage.setItem('username', user.name || user.email);
-                    localStorage.setItem('userId', user.sub);
-                    localStorage.setItem('authToken', token);
-                    
-                    // Show start game button
-                    startGameBtn.style.display = 'inline-block';
-                    
-                    // Update leaderboard
-                    updateLeaderboard();
-                } else {
-                    loginBtn.textContent = 'Login';
-                    loginBtn.onclick = handleLogin;
-                    startGameBtn.style.display = 'none';
-                    localStorage.clear();
-                }
-            } catch (error) {
-                console.error("UI update error:", error);
-            }
-        }
-
-        // Initialize when page loads
+        // Load saved username if exists
         window.onload = async () => {
-            // Update leaderboard immediately
+            const savedUsername = localStorage.getItem('username');
+            if (savedUsername) {
+                usernameInput.value = savedUsername;
+                playButton.disabled = !validateUsername(savedUsername);
+            }
+            
+            // Update leaderboard
             await updateLeaderboard();
-            
-            // Then initialize Auth0
-            await initializeAuth0();
-            
-            // Set up periodic leaderboard updates
-            setInterval(updateLeaderboard, 30000); // Update every 30 seconds
+            setInterval(updateLeaderboard, 30000);
         };
 
-        // Update the updateLeaderboard function
+        // Handle play button click
+        async function handlePlay() {
+            const username = usernameInput.value.trim();
+            
+            if (!validateUsername(username)) {
+                errorMessage.textContent = 'Username must be 3-20 characters';
+                return;
+            }
+
+            // Generate or get existing user_id
+            let userId = localStorage.getItem('userId');
+            if (!userId) {
+                userId = generateUUID();
+                localStorage.setItem('userId', userId);
+            }
+
+            // Save to localStorage
+            localStorage.setItem('username', username);
+            localStorage.setItem('isAuthenticated', 'true');
+
+            // Redirect to game
+            const baseUrl = window.location.origin;
+            window.location.href = `${baseUrl}/game.html`;
+        }
+
+        // Update leaderboard function
         async function updateLeaderboard() {
             try {
                 const { data: scores, error } = await supabaseClient
@@ -169,8 +119,6 @@
                     console.error('Supabase error:', error);
                     return;
                 }
-
-                console.log('Leaderboard data:', scores);
 
                 const leaderboardList = document.getElementById('leaderboardList');
                 
@@ -191,12 +139,7 @@
             }
         }
 
-        // Add startGame function
-        function startGame() {
-            const baseUrl = window.location.origin;
-            window.location.href = `${baseUrl}/game.html`;
-        }
-
+        // Countdown timer
         function updateCountdown() {
             const targetDate = new Date('2024-12-20T14:00:00');
             const now = new Date();
@@ -220,7 +163,6 @@
             `;
         }
 
-        // Update the countdown every second
         updateCountdown();
         setInterval(updateCountdown, 1000);
     </script>

@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flappy Owl - Game</title>
-<script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/phaser.min.js"></script>
 </head>
@@ -18,29 +17,18 @@
 </div>
 
 <script>
-	// Define these variables in the global scope
 	window.baseUrl = window.location.origin;
-	window.isLocalhost = window.location.hostname === 'localhost';
 
 	function goHome() {
 		window.location.href = window.baseUrl;
 	}
 
-	// Initialize Supabase
-	const supabaseClient = supabase.createClient(
-		'https://jkvwfawlgpxtvtxjlsjr.supabase.co',
-		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprdndmYXdsZ3B4dHZ0eGpsc2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQyMjE3MjMsImV4cCI6MjA0OTc5NzcyM30.yKURsZiOq3Vz71Om4xtnpK3xNHHnCnJAYdmExFzfYFI'
-	);
-
 	function checkAuth() {
-		console.log("Checking authentication...");
-		
-		const isAuthenticated = localStorage.getItem('isAuthenticated');
-		const authToken = localStorage.getItem('authToken');
 		const username = localStorage.getItem('username');
 		const userId = localStorage.getItem('userId');
+		const isAuthenticated = localStorage.getItem('isAuthenticated');
 		
-		if (!isAuthenticated || !authToken || !username || !userId) {
+		if (!username || !userId || !isAuthenticated) {
 			console.log("Authentication failed, redirecting to home...");
 			window.location.href = window.baseUrl;
 			return false;
@@ -56,6 +44,12 @@
 			document.body.appendChild(gameScript);
 		}
 	};
+
+	// Initialize Supabase
+	const supabaseClient = supabase.createClient(
+		'https://jkvwfawlgpxtvtxjlsjr.supabase.co',
+		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprdndmYXdsZ3B4dHZ0eGpsc2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQyMjE3MjMsImV4cCI6MjA0OTc5NzcyM30.yKURsZiOq3Vz71Om4xtnpK3xNHHnCnJAYdmExFzfYFI'
+	);
 </script>
 </body>
 </html>
