@@ -166,7 +166,7 @@ game.States.play = {
 		
 		this.gameIsOver = true;
 		
-		// First show game over text
+		// Show game over text FIRST
 		this.showGameOverText();
 		
 		// Then stop game and save score
