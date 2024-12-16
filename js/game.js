@@ -151,26 +151,26 @@ game.States.play = {
 	hitPipe: function() {
 		if(this.gameIsOver) return;
 		this.soundHitPipe.play();
-		this.gameOver(true);
+		this.gameOver();
 	},
 
 	hitGround: function() {
 		if(this.gameIsOver) return;
 		this.hasHitGround = true;
 		this.soundHitGround.play();
-		this.gameOver(true);
+		this.gameOver();
 	},
 
-	gameOver: function(show_text) {
+	gameOver: function() {
 		if (this.gameIsOver) return;
 		
 		this.gameIsOver = true;
 		
-		// Show game over text first
-		this.showGameOverText();
-		
-		// Then stop game and save score
+		// First stop the game
 		this.stopGame();
+		
+		// Then show game over text and save score
+		this.showGameOverText();
 		this.saveScore(this.score);
 	},
 
