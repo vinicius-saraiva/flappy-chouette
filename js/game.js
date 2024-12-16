@@ -7,28 +7,6 @@ if (typeof supabaseClient === 'undefined') {
     window.location.href = window.baseUrl;
 }
 
-// Add at the start of game.js
-function checkAuthentication() {
-    const isAuthenticated = localStorage.getItem('isAuthenticated');
-    const authToken = localStorage.getItem('authToken');
-    
-    console.log("Game.js auth check:", { isAuthenticated, hasToken: !!authToken });
-    
-    if (!isAuthenticated || !authToken) {
-        console.log("Game.js: No local auth found");
-        window.location.href = window.baseUrl;
-        return false;
-    }
-    
-    console.log("Game.js: Authentication verified");
-    return true;
-}
-
-// Simple check at start
-if (!checkAuthentication()) {
-    throw new Error('Not authenticated');
-}
-
 var game = new Phaser.Game(320,505,Phaser.AUTO,'game'); //实例化game
 game.States = {}; //存放state对象
 
@@ -176,13 +154,15 @@ game.States.play = {
 	},
 
 	hitGround: function() {
-		if(this.hasHitGround) return;
+		if(this.gameIsOver) return;
 		this.hasHitGround = true;
 		this.soundHitGround.play();
 		this.gameOver(true);
 	},
 
 	gameOver: function(show_text) {
+		if (this.gameIsOver) return;
+		
 		this.gameIsOver = true;
 		this.stopGame();
 		

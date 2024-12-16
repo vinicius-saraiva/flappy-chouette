@@ -26,10 +26,9 @@
 	function checkAuth() {
 		const username = localStorage.getItem('username');
 		const userId = localStorage.getItem('userId');
-		const isAuthenticated = localStorage.getItem('isAuthenticated');
 		
-		if (!username || !userId || !isAuthenticated) {
-			console.log("Authentication failed, redirecting to home...");
+		if (!username || !userId) {
+			console.log("No username or userId found, redirecting to home...");
 			window.location.href = window.baseUrl;
 			return false;
 		}
