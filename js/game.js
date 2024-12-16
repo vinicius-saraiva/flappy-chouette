@@ -91,6 +91,7 @@ game.States.play = {
 		this.ground.body.immovable = true;
 
 		this.soundFly = game.add.sound('fly_sound');
+		this.soundFly.volume = 3.0;
 		this.soundScore = game.add.sound('score_sound');
 		this.soundHitPipe = game.add.sound('hit_pipe_sound');
 		this.soundHitGround = game.add.sound('hit_ground_sound');
