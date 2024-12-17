@@ -124,10 +124,53 @@ game.States.play = {
 		game.time.events.loop(900, this.generatePipes, this);
 		game.time.events.stop(false);
 
-		// Add both mouse and spacebar to start game
-		game.input.onDown.addOnce(this.statrGame, this);
-		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-		this.spaceKey.onDown.addOnce(this.statrGame, this);
+		// Add both mouse/touch and spacebar to start game
+		if (game.device.desktop) {
+			this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+			this.spaceKey.onDown.addOnce(this.startGame, this);
+		} else {
+			game.input.onDown.addOnce(this.startGame, this);
+		}
+	},
+
+	startGame: function() {
+		this.gameSpeed = 200;
+		this.gameIsOver = false;
+		this.hasHitGround = false;
+		this.hasStarted = true;
+		this.score = 0;
+		this.bg.autoScroll(-(this.gameSpeed/10),0);
+		this.ground.autoScroll(-this.gameSpeed,0);
+		this.bird.body.gravity.y = 1150;
+		this.readyText.destroy();
+		this.playTip.destroy();
+
+		// Add appropriate control method based on device
+		if (game.device.desktop) {
+			this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+			this.spaceKey.onDown.add(this.fly, this);
+		} else {
+			game.input.onDown.add(this.fly, this);
+		}
+
+		game.time.events.start();
+	},
+
+	stopGame: function() {
+		this.bg.stopScroll();
+		this.ground.stopScroll();
+		this.pipeGroup.forEachExists(function(pipe) {
+			pipe.body.velocity.x = 0;
+		}, this);
+		this.bird.animations.stop('fly', 0);
+
+		// Remove both control methods
+		if (game.device.desktop) {
+			this.spaceKey.onDown.remove(this.fly, this);
+		}
+		game.input.onDown.remove(this.fly, this);
+		
+		game.time.events.stop(true);
 	},
 
 	update: function() {
@@ -142,38 +185,6 @@ game.States.play = {
 		game.physics.arcade.overlap(this.bird, this.pipeGroup, this.hitPipe, null, this);
 		if(this.bird.angle < 90) this.bird.angle += 2.5;
 		this.pipeGroup.forEachExists(this.checkScore,this);
-	},
-
-	statrGame: function() {
-		this.gameSpeed = 200;
-		this.gameIsOver = false;
-		this.hasHitGround = false;
-		this.hasStarted = true;
-		this.score = 0;
-		this.bg.autoScroll(-(this.gameSpeed/10),0);
-		this.ground.autoScroll(-this.gameSpeed,0);
-		this.bird.body.gravity.y = 1150;
-		this.readyText.destroy();
-		this.playTip.destroy();
-		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-		this.spaceKey.onDown.add(this.fly, this);
-		game.time.events.start();
-	},
-
-	stopGame: function() {
-		this.bg.stopScroll();
-		this.ground.stopScroll();
-		this.pipeGroup.forEachExists(function(pipe){
-			pipe.body.velocity.x = 0;
-		}, this);
-		this.bird.animations.stop('fly', 0);
-
-
-		game.input.onDown.remove(this.fly, this);
-		if (this.spaceKey) {
-			this.spaceKey.onDown.remove(this.fly, this);
-		}
-		game.time.events.stop(true);
 	},
 
 	fly: function() {
@@ -329,5 +340,5 @@ game.state.add('boot',game.States.boot);
 game.state.add('preload',game.States.preload);
 game.state.add('menu',game.States.menu);
 game.state.add('play',game.States.play);
-game.state.start('boot'); //启动游��
+game.state.start('boot'); //启动游戏
 
