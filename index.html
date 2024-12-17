@@ -16,6 +16,16 @@
             <div id="timer">Loading...</div>
         </div>
 
+        <div class="match-count">
+            <div class="scroll-container">
+                <img src="assets/scoreboard.png" alt="" class="scroll-bg">
+                <div class="scroll-content">
+                    <h2>Matches Played</h2>
+                    <div id="matchCount" class="count-number">Loading...</div>
+                </div>
+            </div>
+        </div>
+
         <div class="leaderboard">
             <h2>Leaderboard</h2>
             <ul class="score-list" id="leaderboardList">
@@ -76,9 +86,14 @@
                 playButton.disabled = !validateUsername(savedUsername);
             }
             
-            // Update leaderboard
-            await updateLeaderboard();
+            // Update leaderboard and match count
+            await Promise.all([
+                updateLeaderboard(),
+                updateMatchCount()
+            ]);
+            
             setInterval(updateLeaderboard, 30000);
+            setInterval(updateMatchCount, 30000);
         };
 
         // Handle play button click
@@ -165,6 +180,45 @@
 
         updateCountdown();
         setInterval(updateCountdown, 1000);
+
+        // Add this after the supabaseClient initialization
+        async function updateMatchCount() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('scores')
+                    .select('id')
+                    .order('id', { ascending: false })
+                    .limit(1);
+
+                if (error) {
+                    console.error('Error fetching match count:', error);
+                    return;
+                }
+
+                const matchCount = data[0]?.id || 0;
+                const matchCountElement = document.getElementById('matchCount');
+                
+                // Animate the number counting up
+                const startNumber = 0;
+                const duration = 2000; // 2 seconds
+                const steps = 60;
+                const increment = matchCount / steps;
+                let currentNumber = startNumber;
+                let step = 0;
+
+                const animation = setInterval(() => {
+                    step++;
+                    currentNumber = Math.min(matchCount, Math.floor(increment * step));
+                    matchCountElement.textContent = currentNumber.toLocaleString();
+                    
+                    if (step >= steps) {
+                        clearInterval(animation);
+                    }
+                }, duration / steps);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
     </script>
 </body>
 </html>

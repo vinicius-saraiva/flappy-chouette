@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+
 body {
     background-color: #8F40FF;
     font-family: Arial, sans-serif;
@@ -182,4 +184,45 @@ button:hover {
     color: black;
     border-radius: 5px;
     min-width: 30px;
+}
+
+.match-count {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.scroll-container {
+    position: relative;
+    display: inline-block;
+    padding: 20px 40px;
+}
+
+.scroll-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.9;
+    z-index: 0;
+}
+
+.scroll-content {
+    position: relative;
+    z-index: 1;
+}
+
+.scroll-content h2 {
+    color: #472f1c;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+    margin-bottom: 10px;
+    font-family: 'MedievalSharp', cursive;
+}
+
+.count-number {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #8b0000;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    font-family: 'MedievalSharp', cursive;
 }
