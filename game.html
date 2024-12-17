@@ -6,14 +6,13 @@
 <title>Flappy Owl - Game</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/phaser.min.js"></script>
+<link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
+<body class="game-body">
 <div id="game"></div>
 
-<div style="position: fixed; top: 10px; left: 10px;">
-    <button onclick="goHome()" style="padding: 10px; cursor: pointer;">
-        Ranking
-    </button>
+<div class="home-button">
+    <button onclick="goHome()">Ranking</button>
 </div>
 
 <script>

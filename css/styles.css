@@ -483,3 +483,48 @@ button:hover {
     font-size: 1.1em;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
+
+/* Game page specific styles */
+.game-body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: 
+        url('../assets/background.png'),
+        url('../assets/background.png');
+    background-repeat: repeat-x;
+    background-position: 
+        0 0,
+        0 100%;
+    transform: scaleY(-1);
+}
+
+#game {
+    position: relative;
+    transform: scaleY(-1); /* This flips the game back to normal */
+}
+
+.home-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    transform: scaleY(-1); /* This flips the button back to normal */
+}
+
+.home-button button {
+    padding: 10px 20px;
+    cursor: pointer;
+    background: linear-gradient(to bottom, #472f1c, #2a1810);
+    border: 2px solid #daa520;
+    color: #FFD700;
+    font-family: 'MedievalSharp', cursive;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.home-button button:hover {
+    background: linear-gradient(to bottom, #5a3b23, #3a2416);
+}
