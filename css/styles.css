@@ -24,6 +24,8 @@ body {
     max-width: 400px;
     margin: 20px auto;
     display: block;
+    max-width: 80%;
+    height: auto;
 }
 
 .countdown {
