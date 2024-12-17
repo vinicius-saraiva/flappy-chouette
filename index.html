@@ -168,10 +168,22 @@
             const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
             document.getElementById('timer').innerHTML = `
-                <span class="countdown-number">${days}</span> jours 
-                <span class="countdown-number">${hours}</span> heures 
-                <span class="countdown-number">${minutes}</span> minutes 
-                <span class="countdown-number">${seconds}</span> secondes
+                <div class="timer-group">
+                    <span class="countdown-number">${days}</span> 
+                    <span class="timer-label">jours</span>
+                </div>
+                <div class="timer-group">
+                    <span class="countdown-number">${hours}</span>
+                    <span class="timer-label">heures</span>
+                </div>
+                <div class="timer-group">
+                    <span class="countdown-number">${minutes}</span>
+                    <span class="timer-label">minutes</span>
+                </div>
+                <div class="timer-group">
+                    <span class="countdown-number">${seconds}</span>
+                    <span class="timer-label">secondes</span>
+                </div>
             `;
         }
 
