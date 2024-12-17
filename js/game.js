@@ -55,7 +55,6 @@ game.States.preload = function(){
 
 game.States.menu = function(){
 	this.create = function(){
-		
 		game.add.tileSprite(0,0,game.width,game.height,'background').autoScroll(-10,0); //背景图
 		game.add.tileSprite(0,game.height-112,game.width,112,'ground').autoScroll(-100,0); //地板
 		var titleGroup = game.add.group(); //创建存放标题的组
@@ -66,10 +65,19 @@ game.States.menu = function(){
 		titleGroup.x = 35;
 		titleGroup.y = 100;
 		game.add.tween(titleGroup).to({ y:120 },1000,null,true,0,Number.MAX_VALUE,true); //标题的缓动动画
-		var btn = game.add.button(game.width/2,game.height/2,'btn',function(){//开始按钮
+		
+		// Start game function
+		const startGame = function() {
 			game.state.start('play');
-		});
+		};
+		
+		// Add button and spacebar controls
+		var btn = game.add.button(game.width/2,game.height/2,'btn', startGame);
 		btn.anchor.setTo(0.5,0.5);
+		
+		// Add spacebar control
+		var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		spaceKey.onDown.addOnce(startGame);
 	}
 }
 
@@ -106,7 +114,11 @@ game.States.play = {
 		this.hasStarted = false;
 		game.time.events.loop(900, this.generatePipes, this);
 		game.time.events.stop(false);
+
+		// Add both mouse and spacebar to start game
 		game.input.onDown.addOnce(this.statrGame, this);
+		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		this.spaceKey.onDown.addOnce(this.statrGame, this);
 	},
 
 	update: function() {
@@ -134,7 +146,8 @@ game.States.play = {
 		this.bird.body.gravity.y = 1150;
 		this.readyText.destroy();
 		this.playTip.destroy();
-		game.input.onDown.add(this.fly, this);
+		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		this.spaceKey.onDown.add(this.fly, this);
 		game.time.events.start();
 	},
 
@@ -145,7 +158,12 @@ game.States.play = {
 			pipe.body.velocity.x = 0;
 		}, this);
 		this.bird.animations.stop('fly', 0);
+
+
 		game.input.onDown.remove(this.fly, this);
+		if (this.spaceKey) {
+			this.spaceKey.onDown.remove(this.fly, this);
+		}
 		game.time.events.stop(true);
 	},
 
@@ -230,10 +248,10 @@ game.States.play = {
 		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup);
 		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup);
 		
-		// Add replay button
-		var replayBtn = game.add.button(game.width/2, 210, 'btn', function(){
-			game.state.start('play');
-		}, this, null, null, null, null, this.gameOverGroup);
+		// Add replay button and spacebar control
+		var replayBtn = game.add.button(game.width/2, 210, 'btn', this.restartGame, this, null, null, null, null, this.gameOverGroup);
+		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		this.spaceKey.onDown.addOnce(this.restartGame, this);
 		
 		// Set anchors
 		gameOverText.anchor.setTo(0.5, 0);
@@ -289,6 +307,11 @@ game.States.play = {
 		if(this.gameIsOver) return;
 		this.soundHitPipe.play();  // Reuse pipe hit sound
 		this.gameOver();
+	},
+
+	// Add new method for restarting
+	restartGame: function() {
+		game.state.start('play');
 	}
 }
 

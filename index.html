@@ -11,6 +11,13 @@
     <div class="container">
         <img src="assets/title.png" alt="Flappy Owl" class="logo">
 
+        <div class="announcement">
+            <h2>Annonces</h2>
+            <div id="announcement-content">
+                🎮 Sur ordinateur, utilisez la barre d'espace pour jouer !
+            </div>
+        </div>
+
         <div class="countdown">
             <h2>Le vrai maitre de la Chouette sera proclamé dans...</h2>
             <div id="timer">Loading...</div>
@@ -46,6 +53,13 @@
             <div id="errorMessage" class="error-message"></div>
         </div>
     </div>
+
+    <footer class="footer">
+        <div class="gold-bar" style="margin: 20px 0;">
+            <a href="https://github.com/vinicius-saraiva/flappy-chouette" target="_blank" class="github-link">GitHub</a>
+            <span class="footer-text" style="color: #FFD700;">- Les pull requests sont les bienvenues, n'hésitez pas à proposer vos améliorations !</span>
+        </div>
+    </footer>
 
     <script>
         // Initialize Supabase
@@ -127,29 +141,52 @@
             try {
                 const { data: scores, error } = await supabaseClient
                     .from('scores')
-                    .select('username, score, created_at')
+                    .select('username, score')
                     .order('score', { ascending: false })
-                    .limit(10);
+                    .limit(15);
 
-                if (error) {
-                    console.error('Supabase error:', error);
-                    return;
-                }
+                if (error) throw error;
 
                 const leaderboardList = document.getElementById('leaderboardList');
                 
                 if (!scores || scores.length === 0) {
-                    leaderboardList.innerHTML = '<li>No scores yet - Be the first!</li>';
+                    leaderboardList.innerHTML = '<li class="score-item"><span>No scores yet - Be the first!</span></li>';
                     return;
                 }
 
-                leaderboardList.innerHTML = scores.map((entry, index) => `
-                    <li class="score-item">
-                        <span class="rank">${index + 1}</span>
-                        <span class="username">${entry.username}</span>
-                        <span class="score">${entry.score}</span>
-                    </li>
-                `).join('');
+                // Clear any existing content
+                leaderboardList.innerHTML = '';
+
+                // Top 3 podium
+                const topThree = scores.slice(0, 3);
+                const podiumHTML = `
+                    <div class="top-three">
+                        ${topThree.map((entry, index) => `
+                            <div class="podium-item podium-${index + 1}">
+                                <div class="podium-rank">#${index + 1}</div>
+                                <div class="podium-username">${entry.username}</div>
+                                <div class="podium-score">${entry.score}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Regular scores (4-15)
+                const restScores = scores.slice(3);
+                const regularScoresHTML = `
+                    <div class="regular-scores">
+                        ${restScores.map((entry, index) => `
+                            <div class="score-item">
+                                <span class="rank">${index + 4}</span>
+                                <span class="username">${entry.username}</span>
+                                <span class="score">${entry.score}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Combine both sections
+                leaderboardList.innerHTML = podiumHTML + regularScoresHTML;
             } catch (error) {
                 console.error('Error fetching leaderboard:', error);
             }
