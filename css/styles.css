@@ -191,38 +191,30 @@ button:hover {
     margin: 20px 0;
 }
 
-.scroll-container {
-    position: relative;
-    display: inline-block;
-    padding: 20px 40px;
+.gold-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(to bottom, #ffd700, #b8860b);
+    padding: 8px 20px;
+    border-radius: 5px;
+    box-shadow: 
+        inset 0 0 10px rgba(255, 255, 255, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 1px solid #daa520;
 }
 
-.scroll-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.9;
-    z-index: 0;
-}
-
-.scroll-content {
-    position: relative;
-    z-index: 1;
-}
-
-.scroll-content h2 {
+.gold-bar span {
     color: #472f1c;
-    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
-    margin-bottom: 10px;
     font-family: 'MedievalSharp', cursive;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
 }
 
 .count-number {
-    font-size: 2.5em;
+    font-size: 1.2em;
     font-weight: bold;
-    color: #8b0000;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    color: #472f1c;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
     font-family: 'MedievalSharp', cursive;
 }
