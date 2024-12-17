@@ -201,13 +201,38 @@ game.States.play = {
 		if (this.gameIsOver) return;
 		
 		this.gameIsOver = true;
-		
-		// Show game over text FIRST
-		this.showGameOverText();
-		
-		// Then stop game and save score
 		this.stopGame();
 		this.saveScore(this.score);
+		
+		// Create game over group
+		this.gameOverGroup = game.add.group();
+		
+		// Add game over elements to group
+		var gameOverText = this.gameOverGroup.create(game.width/2, 0, 'game_over');
+		var scoreboard = this.gameOverGroup.create(game.width/2, 70, 'score_board');
+		
+		// Add score texts
+		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup);
+		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup);
+		
+		// Set anchors for game over elements
+		gameOverText.anchor.setTo(0.5, 0);
+		scoreboard.anchor.setTo(0.5, 0);
+		
+		// Position the group
+		this.gameOverGroup.y = 30;
+
+		// Create restart button (image only)
+		this.restartBtn = game.add.button(game.width/2, game.height/2, 'start-button', function(){
+			game.state.start('play');
+		}, this);
+		this.restartBtn.anchor.setTo(0.5, 0.5);
+		
+		// Add ranking button (image only)
+		this.rankingBtn = game.add.button(game.width/2, game.height/2 + 80, 'ranking-button', function(){
+			window.location.href = window.baseUrl;
+		}, this);
+		this.rankingBtn.anchor.setTo(0.5, 0.5);
 	},
 
 	saveScore: function(score) {
@@ -244,33 +269,6 @@ game.States.play = {
 			.catch(error => {
 				console.error('Error saving score:', error);
 			});
-	},
-
-	showGameOverText: function(){
-		this.scoreText.destroy();
-		game.bestScore = game.bestScore || 0;
-		if(this.score > game.bestScore) game.bestScore = this.score;
-		
-		this.gameOverGroup = game.add.group();
-		
-		// Add game over elements to group
-		var gameOverText = this.gameOverGroup.create(game.width/2, 0, 'game_over');
-		var scoreboard = this.gameOverGroup.create(game.width/2, 70, 'score_board');
-		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup);
-		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup);
-		
-		// Add replay button and spacebar control
-		var replayBtn = game.add.button(game.width/2, 210, 'btn', this.restartGame, this, null, null, null, null, this.gameOverGroup);
-		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-		this.spaceKey.onDown.addOnce(this.restartGame, this);
-		
-		// Set anchors
-		gameOverText.anchor.setTo(0.5, 0);
-		scoreboard.anchor.setTo(0.5, 0);
-		replayBtn.anchor.setTo(0.5, 0);
-		
-		// Position the group
-		this.gameOverGroup.y = 30;
 	},
 
 	generatePipes: function(gap){ //制造管道
@@ -326,58 +324,15 @@ game.States.play = {
 	}
 }
 
-game.States.over = {
-    create: function() {
-        console.log('Creating game over state...');
-        
-        // Create game over text
-        game.add.text(game.width/2, game.height/3, "GAME OVER", {
-            font: '40px "Press Start 2P"',
-            fill: '#fff',
-            stroke: '#430',
-            strokeThickness: 4,
-            align: 'center'
-        }).anchor.setTo(0.5, 0.5);
+// Remove the separate 'over' state since we're handling game over in the play state
+game.state.remove('over');
 
-        // Create restart button
-        this.restartBtn = game.add.button(game.width/2, game.height/2, 'start-button', function(){
-            game.state.start('play');
-        }, this);
-        this.restartBtn.anchor.setTo(0.5, 0.5);
-        console.log('Restart button created');
-        
-        // Add ranking button using the new asset
-        this.rankingBtn = game.add.button(game.width/2, game.height/2 + 80, 'ranking-button', function(){
-            window.location.href = window.baseUrl;
-        }, this);
-        this.rankingBtn.anchor.setTo(0.5, 0.5);
-        console.log('Ranking button created');
-        
-        // Add text on buttons
-        this.restartText = game.add.text(game.width/2, game.height/2, "Restart", {
-            font: '20px "Press Start 2P"',
-            fill: '#fff',
-            stroke: '#430',
-            strokeThickness: 4
-        });
-        this.restartText.anchor.setTo(0.5, 0.5);
-        
-        this.rankingText = game.add.text(game.width/2, game.height/2 + 80, "Ranking", {
-            font: '20px "Press Start 2P"',
-            fill: '#fff',
-            stroke: '#430',
-            strokeThickness: 4
-        });
-        this.rankingText.anchor.setTo(0.5, 0.5);
-        console.log('Button texts created');
-    }
-};
+// Update the state additions at the bottom of the file
+game.state.add('boot', game.States.boot);
+game.state.add('preload', game.States.preload);
+game.state.add('menu', game.States.menu);
+game.state.add('play', game.States.play);
+// Remove the 'over' state addition
 
-//添加state到游戏
-game.state.add('boot',game.States.boot);
-game.state.add('preload',game.States.preload);
-game.state.add('menu',game.States.menu);
-game.state.add('play',game.States.play);
-game.state.add('over', game.States.over);
 game.state.start('boot'); //启动游戏
 
