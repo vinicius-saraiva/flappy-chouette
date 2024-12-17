@@ -21,6 +21,10 @@
                 <span>Matches Played:</span>
                 <div id="matchCount" class="count-number">Loading...</div>
             </div>
+            <div class="gold-bar" style="margin-top: 10px;">
+                <span>Last match by</span>
+                <div id="lastPlayer" class="count-number">Loading...</div>
+            </div>
         </div>
 
         <div class="leaderboard">
@@ -195,8 +199,8 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('scores')
-                    .select('id')
-                    .order('id', { ascending: false })
+                    .select('id, username')
+                    .order('created_at', { ascending: false })
                     .limit(1);
 
                 if (error) {
@@ -205,7 +209,12 @@
                 }
 
                 const matchCount = data[0]?.id || 0;
+                const lastPlayer = data[0]?.username || 'No one yet';
                 const matchCountElement = document.getElementById('matchCount');
+                const lastPlayerElement = document.getElementById('lastPlayer');
+                
+                // Update last player
+                lastPlayerElement.textContent = lastPlayer;
                 
                 // Animate the number counting up
                 const startNumber = 0;
