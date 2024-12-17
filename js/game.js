@@ -110,6 +110,12 @@ game.States.play = {
 
 	update: function() {
 		if(!this.hasStarted) return;
+		
+		// Add boundary check for bird going too high
+		if(this.bird.y < 0) {  // If bird goes above the game frame
+			this.hitBoundary();
+		}
+		
 		game.physics.arcade.collide(this.bird,this.ground, this.hitGround, null, this);
 		game.physics.arcade.overlap(this.bird, this.pipeGroup, this.hitPipe, null, this);
 		if(this.bird.angle < 90) this.bird.angle += 2.5;
@@ -275,6 +281,13 @@ game.States.play = {
 			return true;
 		}
 		return false;
+	},
+
+	// Add new method for boundary collision
+	hitBoundary: function() {
+		if(this.gameIsOver) return;
+		this.soundHitPipe.play();  // Reuse pipe hit sound
+		this.gameOver();
 	}
 }
 
