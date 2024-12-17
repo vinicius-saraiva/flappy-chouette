@@ -113,7 +113,7 @@
                     .from('scores')
                     .select('username, score, created_at')
                     .order('score', { ascending: false })
-                    .limit(5);
+                    .limit(10);
 
                 if (error) {
                     console.error('Supabase error:', error);
