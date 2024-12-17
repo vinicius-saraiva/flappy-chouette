@@ -1,13 +1,22 @@
 // At the start of game.js
-// const baseUrl = window.location.origin;
-// const isLocalhost = baseUrl.includes('localhost');
+// Calculate game size based on window height
+const calculateGameSize = () => {
+    const maxHeight = 750;
+    const windowHeight = window.innerHeight;
+    const gameHeight = Math.min(windowHeight, maxHeight);
+    const aspectRatio = 320/505; // Original game aspect ratio
+    const gameWidth = Math.floor(gameHeight * aspectRatio);
+    return { width: gameWidth, height: gameHeight };
+};
+
+const gameSize = calculateGameSize();
+var game = new Phaser.Game(gameSize.width, gameSize.height, Phaser.AUTO, 'game');
 
 if (typeof supabaseClient === 'undefined') {
     console.error('Supabase client not initialized');
     window.location.href = window.baseUrl;
 }
 
-var game = new Phaser.Game(320,505,Phaser.AUTO,'game'); //实例化game
 game.States = {}; //存放state对象
 
 game.States.boot = function(){
@@ -320,5 +329,5 @@ game.state.add('boot',game.States.boot);
 game.state.add('preload',game.States.preload);
 game.state.add('menu',game.States.menu);
 game.state.add('play',game.States.play);
-game.state.start('boot'); //启动游戏
+game.state.start('boot'); //启动游��
 
