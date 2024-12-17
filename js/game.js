@@ -93,6 +93,7 @@ game.States.play = {
 		this.soundFly = game.add.sound('fly_sound');
 		this.soundFly.volume = 3.0;
 		this.soundScore = game.add.sound('score_sound');
+		this.soundScore.volume = 0.5;
 		this.soundHitPipe = game.add.sound('hit_pipe_sound');
 		this.soundHitGround = game.add.sound('hit_ground_sound');
 		this.scoreText = game.add.bitmapText(game.world.centerX-20, 30, 'flappy_font', '0', 36);
