@@ -56,6 +56,8 @@ game.States.preload = function(){
 		game.load.image('play_tip', `${assetPath}instructions.png`);
 		game.load.image('game_over', `${assetPath}gameover.png`);
 		game.load.image('score_board', `${assetPath}scoreboard.png`);
+		game.load.image('start-button', 'assets/start-button.png');
+		game.load.image('ranking-button', 'assets/ranking-button.png');
 	}
 	this.create = function(){
 		game.state.start('menu');
@@ -124,53 +126,10 @@ game.States.play = {
 		game.time.events.loop(900, this.generatePipes, this);
 		game.time.events.stop(false);
 
-		// Add both mouse/touch and spacebar to start game
-		if (game.device.desktop) {
-			this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-			this.spaceKey.onDown.addOnce(this.startGame, this);
-		} else {
-			game.input.onDown.addOnce(this.startGame, this);
-		}
-	},
-
-	startGame: function() {
-		this.gameSpeed = 200;
-		this.gameIsOver = false;
-		this.hasHitGround = false;
-		this.hasStarted = true;
-		this.score = 0;
-		this.bg.autoScroll(-(this.gameSpeed/10),0);
-		this.ground.autoScroll(-this.gameSpeed,0);
-		this.bird.body.gravity.y = 1150;
-		this.readyText.destroy();
-		this.playTip.destroy();
-
-		// Add appropriate control method based on device
-		if (game.device.desktop) {
-			this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-			this.spaceKey.onDown.add(this.fly, this);
-		} else {
-			game.input.onDown.add(this.fly, this);
-		}
-
-		game.time.events.start();
-	},
-
-	stopGame: function() {
-		this.bg.stopScroll();
-		this.ground.stopScroll();
-		this.pipeGroup.forEachExists(function(pipe) {
-			pipe.body.velocity.x = 0;
-		}, this);
-		this.bird.animations.stop('fly', 0);
-
-		// Remove both control methods
-		if (game.device.desktop) {
-			this.spaceKey.onDown.remove(this.fly, this);
-		}
-		game.input.onDown.remove(this.fly, this);
-		
-		game.time.events.stop(true);
+		// Add both mouse and spacebar to start game
+		game.input.onDown.addOnce(this.statrGame, this);
+		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		this.spaceKey.onDown.addOnce(this.statrGame, this);
 	},
 
 	update: function() {
@@ -185,6 +144,38 @@ game.States.play = {
 		game.physics.arcade.overlap(this.bird, this.pipeGroup, this.hitPipe, null, this);
 		if(this.bird.angle < 90) this.bird.angle += 2.5;
 		this.pipeGroup.forEachExists(this.checkScore,this);
+	},
+
+	statrGame: function() {
+		this.gameSpeed = 200;
+		this.gameIsOver = false;
+		this.hasHitGround = false;
+		this.hasStarted = true;
+		this.score = 0;
+		this.bg.autoScroll(-(this.gameSpeed/10),0);
+		this.ground.autoScroll(-this.gameSpeed,0);
+		this.bird.body.gravity.y = 1150;
+		this.readyText.destroy();
+		this.playTip.destroy();
+		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		this.spaceKey.onDown.add(this.fly, this);
+		game.time.events.start();
+	},
+
+	stopGame: function() {
+		this.bg.stopScroll();
+		this.ground.stopScroll();
+		this.pipeGroup.forEachExists(function(pipe){
+			pipe.body.velocity.x = 0;
+		}, this);
+		this.bird.animations.stop('fly', 0);
+
+
+		game.input.onDown.remove(this.fly, this);
+		if (this.spaceKey) {
+			this.spaceKey.onDown.remove(this.fly, this);
+		}
+		game.time.events.stop(true);
 	},
 
 	fly: function() {
@@ -335,10 +326,58 @@ game.States.play = {
 	}
 }
 
+game.States.over = {
+    create: function() {
+        console.log('Creating game over state...');
+        
+        // Create game over text
+        game.add.text(game.width/2, game.height/3, "GAME OVER", {
+            font: '40px "Press Start 2P"',
+            fill: '#fff',
+            stroke: '#430',
+            strokeThickness: 4,
+            align: 'center'
+        }).anchor.setTo(0.5, 0.5);
+
+        // Create restart button
+        this.restartBtn = game.add.button(game.width/2, game.height/2, 'start-button', function(){
+            game.state.start('play');
+        }, this);
+        this.restartBtn.anchor.setTo(0.5, 0.5);
+        console.log('Restart button created');
+        
+        // Add ranking button using the new asset
+        this.rankingBtn = game.add.button(game.width/2, game.height/2 + 80, 'ranking-button', function(){
+            window.location.href = window.baseUrl;
+        }, this);
+        this.rankingBtn.anchor.setTo(0.5, 0.5);
+        console.log('Ranking button created');
+        
+        // Add text on buttons
+        this.restartText = game.add.text(game.width/2, game.height/2, "Restart", {
+            font: '20px "Press Start 2P"',
+            fill: '#fff',
+            stroke: '#430',
+            strokeThickness: 4
+        });
+        this.restartText.anchor.setTo(0.5, 0.5);
+        
+        this.rankingText = game.add.text(game.width/2, game.height/2 + 80, "Ranking", {
+            font: '20px "Press Start 2P"',
+            fill: '#fff',
+            stroke: '#430',
+            strokeThickness: 4
+        });
+        this.rankingText.anchor.setTo(0.5, 0.5);
+        console.log('Button texts created');
+    }
+};
+
 //添加state到游戏
 game.state.add('boot',game.States.boot);
 game.state.add('preload',game.States.preload);
 game.state.add('menu',game.States.menu);
 game.state.add('play',game.States.play);
+game.state.add('over', game.States.over);
 game.state.start('boot'); //启动游戏
 
