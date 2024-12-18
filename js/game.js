@@ -1,16 +1,25 @@
 // At the start of game.js
-// Calculate game size based on window height
 const calculateGameSize = () => {
     const maxHeight = 750;
     const windowHeight = window.innerHeight;
     const gameHeight = Math.min(windowHeight, maxHeight);
-    const aspectRatio = 320/505; // Original game aspect ratio
-    const gameWidth = Math.floor(gameHeight * aspectRatio);
-    return { width: gameWidth, height: gameHeight };
+    
+    // For desktop, use window width, detect desktop using window width as a simple heuristic
+    const isDesktop = window.innerWidth > 768;
+    const gameWidth = isDesktop ? window.innerWidth : Math.floor(gameHeight * (320/505));
+    
+    return { 
+        width: gameWidth, 
+        height: gameHeight,
+        isDesktop: isDesktop 
+    };
 };
 
 const gameSize = calculateGameSize();
 var game = new Phaser.Game(gameSize.width, gameSize.height, Phaser.AUTO, 'game');
+
+// Store isDesktop as a global game property
+game.isDesktop = gameSize.isDesktop;
 
 if (typeof supabaseClient === 'undefined') {
     console.error('Supabase client not initialized');
@@ -98,7 +107,10 @@ game.States.play = {
 		this.pipeGroup = game.add.group();
 		this.pipeGroup.enableBody = true;
 		this.ground = game.add.tileSprite(0,game.height-112,game.width,112,'ground');
-		this.bird = game.add.sprite(50,150,'bird');
+		
+		// Position bird relative to screen width for desktop
+		const birdX = game.isDesktop ? window.innerWidth * 0.2 : 50;
+		this.bird = game.add.sprite(birdX, 150, 'bird');
 		this.bird.animations.add('fly');
 		this.bird.animations.play('fly',12,true);
 		this.bird.anchor.setTo(0.5, 0.5);
@@ -123,10 +135,11 @@ game.States.play = {
 		this.playTip.anchor.setTo(0.5, 0);
 
 		this.hasStarted = false;
-		game.time.events.loop(900, this.generatePipes, this);
+		const pipeInterval = game.isDesktop ? 1500 : 900; // Adjusted timing for desktop
+		game.time.events.loop(pipeInterval, this.generatePipes, this);
 		game.time.events.stop(false);
 
-		// Add both mouse/touch and spacebar to start game
+		// Make sure both input methods are properly bound
 		game.input.onDown.addOnce(this.statrGame, this);
 		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 		this.spaceKey.onDown.addOnce(this.statrGame, this);
@@ -147,35 +160,43 @@ game.States.play = {
 	},
 
 	statrGame: function() {
-		this.gameSpeed = 200;
+		if (this.hasStarted) return;
+		
 		this.gameIsOver = false;
 		this.hasHitGround = false;
 		this.hasStarted = true;
 		this.score = 0;
-		this.bg.autoScroll(-(this.gameSpeed/10),0);
-		this.ground.autoScroll(-this.gameSpeed,0);
+		
+		// Adjust game speed based on screen width for desktop
+		if(game.isDesktop) {
+			this.gameSpeed = 350 * (game.width / 1920); // Increased base speed for desktop
+		} else {
+			this.gameSpeed = 200;
+		}
+
+		this.bg.autoScroll(-(this.gameSpeed/10), 0);
+		this.ground.autoScroll(-this.gameSpeed, 0);
 		this.bird.body.gravity.y = 1150;
 		this.readyText.destroy();
 		this.playTip.destroy();
-		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-		this.spaceKey.onDown.add(this.fly, this);
-		game.time.events.start();
 
-		// Add both touch/mouse and spacebar controls for flapping
+		// Add both input methods for flapping
 		game.input.onDown.add(this.fly, this);
 		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 		this.spaceKey.onDown.add(this.fly, this);
+
+		game.time.events.start();
 	},
 
 	stopGame: function() {
 		this.bg.stopScroll();
 		this.ground.stopScroll();
-		this.pipeGroup.forEachExists(function(pipe){
+		this.pipeGroup.forEachExists(function(pipe) {
 			pipe.body.velocity.x = 0;
 		}, this);
 		this.bird.animations.stop('fly', 0);
 
-		// Remove both touch/mouse and spacebar controls
+		// Remove both input methods
 		game.input.onDown.remove(this.fly, this);
 		if (this.spaceKey) {
 			this.spaceKey.onDown.remove(this.fly, this);
@@ -253,9 +274,7 @@ game.States.play = {
 		this.gameOverGroup.y = 30;
 
 		// Create restart button (image only)
-		this.restartBtn = game.add.button(game.width/2, game.height/2, 'start-button', function(){
-			game.state.start('play');
-		}, this);
+		this.restartBtn = game.add.button(game.width/2, game.height/2, 'start-button', this.restartGame, this);
 		this.restartBtn.anchor.setTo(0.5, 0.5);
 		
 		// Add ranking button (image only)
@@ -263,6 +282,10 @@ game.States.play = {
 			window.location.href = window.baseUrl;
 		}, this);
 		this.rankingBtn.anchor.setTo(0.5, 0.5);
+
+		// Add spacebar control for restart
+		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		this.spaceKey.onDown.addOnce(this.restartGame, this);
 	},
 
 	saveScore: function(score) {
@@ -298,29 +321,39 @@ game.States.play = {
 			});
 	},
 
-	generatePipes: function(gap){ //制造管道
-		gap = gap || 100; //上下管道之间的间隙宽度
-		var position = (505 - 320 - gap) + Math.floor((505 - 112 - 30 - gap - 505 + 320 + gap) * Math.random());
-		var topPipeY = position-360;
-		var bottomPipeY = position+gap;
+	generatePipes: function(gap) {
+		// Adjust gap size based on platform
+		if(game.isDesktop) {
+			gap = 100; // Slightly larger than mobile but not too large
+		} else {
+			gap = gap || 100; // Original gap for mobile
+		}
+		
+		const position = (505 - 320 - gap) + Math.floor((505 - 112 - 30 - gap - 505 + 320 + gap) * Math.random());
+		const topPipeY = position - 360;
+		const bottomPipeY = position + gap;
 
-		if(this.resetPipe(topPipeY,bottomPipeY)) return;
+		if(this.resetPipe(topPipeY, bottomPipeY)) return;
 
-		var topPipe = game.add.sprite(game.width, topPipeY, 'pipe', 0, this.pipeGroup);
-		var bottomPipe = game.add.sprite(game.width, bottomPipeY, 'pipe', 1, this.pipeGroup);
-		this.pipeGroup.setAll('checkWorldBounds',true);
-		this.pipeGroup.setAll('outOfBoundsKill',true);
+		const startX = game.width;
+		
+		var topPipe = game.add.sprite(startX, topPipeY, 'pipe', 0, this.pipeGroup);
+		var bottomPipe = game.add.sprite(startX, bottomPipeY, 'pipe', 1, this.pipeGroup);
+		this.pipeGroup.setAll('checkWorldBounds', true);
+		this.pipeGroup.setAll('outOfBoundsKill', true);
 		this.pipeGroup.setAll('body.velocity.x', -this.gameSpeed);
 	},
 
 	resetPipe: function(topPipeY,bottomPipeY){//重置出了边界的管道，做到利用
 		var i = 0;
+		const startX = game.isDesktop ? game.width : game.width;
+		
 		this.pipeGroup.forEachDead(function(pipe){
 			if(pipe.y<=0){ //topPipe
-				pipe.reset(game.width, topPipeY);
+				pipe.reset(startX, topPipeY);
 				pipe.hasScored = false; //重置为未得分
 			}else{
-				pipe.reset(game.width, bottomPipeY);
+				pipe.reset(startX, bottomPipeY);
 			}
 			pipe.body.velocity.x = -this.gameSpeed;
 			i++;
