@@ -126,7 +126,7 @@ game.States.play = {
 		game.time.events.loop(900, this.generatePipes, this);
 		game.time.events.stop(false);
 
-		// Add both mouse and spacebar to start game
+		// Add both mouse/touch and spacebar to start game
 		game.input.onDown.addOnce(this.statrGame, this);
 		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 		this.spaceKey.onDown.addOnce(this.statrGame, this);
@@ -160,6 +160,11 @@ game.States.play = {
 		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 		this.spaceKey.onDown.add(this.fly, this);
 		game.time.events.start();
+
+		// Add both touch/mouse and spacebar controls for flapping
+		game.input.onDown.add(this.fly, this);
+		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		this.spaceKey.onDown.add(this.fly, this);
 	},
 
 	stopGame: function() {
@@ -170,7 +175,7 @@ game.States.play = {
 		}, this);
 		this.bird.animations.stop('fly', 0);
 
-
+		// Remove both touch/mouse and spacebar controls
 		game.input.onDown.remove(this.fly, this);
 		if (this.spaceKey) {
 			this.spaceKey.onDown.remove(this.fly, this);
@@ -204,6 +209,31 @@ game.States.play = {
 		this.stopGame();
 		this.saveScore(this.score);
 		
+		// Fetch best score before showing game over screen
+		const userId = localStorage.getItem('userId');
+		
+		supabaseClient
+			.from('scores')
+			.select('score')
+			.eq('user_id', userId)
+			.order('score', { ascending: false })
+			.limit(1)
+			.then(response => {
+				if (response.error) {
+					console.error('Error fetching best score:', response.error);
+					this.showGameOverScreen(0); // Show 0 as best score if error
+				} else {
+					const bestScore = response.data.length > 0 ? response.data[0].score : 0;
+					this.showGameOverScreen(bestScore);
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				this.showGameOverScreen(0); // Show 0 as best score if error
+			});
+	},
+
+	showGameOverScreen: function(bestScore) {
 		// Create game over group
 		this.gameOverGroup = game.add.group();
 		
@@ -213,7 +243,7 @@ game.States.play = {
 		
 		// Add score texts
 		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup);
-		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup);
+		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', bestScore+'', 20, this.gameOverGroup);
 		
 		// Set anchors for game over elements
 		gameOverText.anchor.setTo(0.5, 0);
