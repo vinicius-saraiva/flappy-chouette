@@ -504,6 +504,9 @@ button:hover {
     background-position: 
         0 0,
         0 100%;
+    background-size:
+        auto 50%,
+        auto 50%;
     transform: scaleY(-1);
     position: fixed;
     width: 100%;
