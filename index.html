@@ -139,11 +139,30 @@
         // Update leaderboard function
         async function updateLeaderboard() {
             try {
+                // Modified query to get only the highest score per username
                 const { data: scores, error } = await supabaseClient
                     .from('scores')
                     .select('username, score')
                     .order('score', { ascending: false })
-                    .limit(15);
+                    .limit(1000) // Get a large initial set
+                    .then(response => {
+                        if (response.error) throw response.error;
+                        
+                        // Group by username and keep highest score
+                        const uniqueScores = response.data.reduce((acc, current) => {
+                            if (!acc[current.username] || acc[current.username].score < current.score) {
+                                acc[current.username] = current;
+                            }
+                            return acc;
+                        }, {});
+
+                        // Convert back to array and sort
+                        return {
+                            data: Object.values(uniqueScores)
+                                .sort((a, b) => b.score - a.score)
+                                .slice(0, 15) // Keep top 15
+                        };
+                    });
 
                 if (error) throw error;
 
