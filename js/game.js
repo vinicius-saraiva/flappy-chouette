@@ -135,7 +135,7 @@ game.States.play = {
 		this.playTip.anchor.setTo(0.5, 0);
 
 		this.hasStarted = false;
-		const pipeInterval = game.isDesktop ? 1500 : 900; // Adjusted timing for desktop
+		const pipeInterval = game.isDesktop ? 1000 : 900; // Reduced from 1500 to 1200 for desktop
 		game.time.events.loop(pipeInterval, this.generatePipes, this);
 		game.time.events.stop(false);
 
