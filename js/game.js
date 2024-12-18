@@ -209,13 +209,13 @@ game.States.play = {
 		this.stopGame();
 		this.saveScore(this.score);
 		
-		// Fetch best score before showing game over screen
-		const userId = localStorage.getItem('userId');
+		// Fetch best score using username instead of userId
+		const username = localStorage.getItem('username');
 		
 		supabaseClient
 			.from('scores')
 			.select('score')
-			.eq('user_id', userId)
+			.eq('username', username)
 			.order('score', { ascending: false })
 			.limit(1)
 			.then(response => {
@@ -267,15 +267,13 @@ game.States.play = {
 
 	saveScore: function(score) {
 		const username = localStorage.getItem('username');
-		const userId = localStorage.getItem('userId');
 		
-		if (!username || !userId) {
-			console.error('User not properly authenticated');
+		if (!username) {
+			console.error('Username not found');
 			return;
 		}
 
 		console.log('Saving score:', {
-			user_id: userId,
 			username: username,
 			score: score
 		});
@@ -284,7 +282,6 @@ game.States.play = {
 			.from('scores')
 			.insert([
 				{
-					user_id: userId,
 					username: username,
 					score: score
 				}
