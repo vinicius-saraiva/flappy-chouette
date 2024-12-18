@@ -296,8 +296,12 @@ game.States.play = {
 			return;
 		}
 
+		// Generate a random user_id if needed
+		const userId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+
 		console.log('Saving score:', {
 			username: username,
+			user_id: userId,
 			score: score
 		});
 
@@ -306,6 +310,7 @@ game.States.play = {
 			.insert([
 				{
 					username: username,
+					user_id: userId,
 					score: score
 				}
 			])
