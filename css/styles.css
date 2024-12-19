@@ -574,3 +574,269 @@ button:hover {
         font-size: 14px;
     }
 }
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.feature-text {
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+}
+
+.vote-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.vote-count {
+    min-width: 30px;
+    text-align: center;
+}
+
+/* Feature Request Button Styling */
+#featureRequestBtn {
+    background: linear-gradient(to bottom, #472f1c, #2a1810);
+    border: 2px solid #daa520;
+    color: #FFD700;
+    font-family: 'MedievalSharp', cursive;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 
+        inset 0 0 15px rgba(255, 215, 0, 0.2),
+        0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    width: 80%;
+    max-width: 400px;
+    margin: 20px auto;
+    display: block;
+}
+
+#featureRequestBtn:hover {
+    background: linear-gradient(to bottom, #5a3b23, #3a2416);
+}
+
+/* Modal Styling */
+.modal-content {
+    background: linear-gradient(to bottom, #472f1c, #2a1810);
+    border: 2px solid #daa520;
+    border-radius: 10px;
+    box-shadow: 
+        inset 0 0 15px rgba(255, 215, 0, 0.2),
+        0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    border-bottom: 2px solid #daa520;
+    background: linear-gradient(to bottom, #472f1c, #2a1810);
+    border-radius: 8px 8px 0 0;
+}
+
+.modal-title {
+    color: #FFD700;
+    font-family: 'MedievalSharp', cursive;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+}
+
+.btn-close {
+    color: #FFD700;
+    text-shadow: none;
+    opacity: 0.8;
+}
+
+/* Feature Items Styling */
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(to bottom, #e6c78c, #b8860b);
+    border: 1px solid #daa520;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 
+        inset 0 0 5px rgba(255, 255, 255, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.feature-text {
+    color: #472f1c;
+    font-family: 'MedievalSharp', cursive;
+    margin: 0;
+    padding: 0;
+}
+
+.vote-count {
+    color: #472f1c;
+    font-family: 'MedievalSharp', cursive;
+    font-weight: bold;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* Vote Buttons Styling */
+.vote-buttons .btn {
+    background: linear-gradient(to bottom, #472f1c, #2a1810);
+    border: 1px solid #daa520;
+    color: #FFD700;
+    padding: 2px 8px;
+    margin: 0 2px;
+    border-radius: 5px;
+    font-family: 'MedievalSharp', cursive;
+    transition: all 0.3s ease;
+}
+
+.vote-buttons .btn:hover {
+    background: linear-gradient(to bottom, #5a3b23, #3a2416);
+}
+
+/* Feature Input Styling */
+.feature-input {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+}
+
+#newFeature {
+    width: 100%;
+    background: linear-gradient(to bottom, #e6c78c, #d4af37);
+    border: 1px solid #daa520;
+    color: #472f1c;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 5px;
+    font-family: 'MedievalSharp', cursive;
+    box-sizing: border-box;
+    resize: vertical;     /* Allow vertical resizing */
+    min-height: 60px;     /* Height for 2 lines */
+    max-height: 200px;    /* Maximum height when resizing */
+}
+
+#newFeature::placeholder {
+    color: #472f1c;
+    opacity: 0.7;
+}
+
+#submitFeature {
+    width: 288px !important; /* Force width with !important */
+    background: linear-gradient(to bottom, #ffd700, #daa520);
+    border: 1px solid #daa520;
+    color: #472f1c;
+    font-family: 'MedievalSharp', cursive;
+    font-weight: bold;
+    padding: 8px 20px;
+    margin-top: 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+#submitFeature:hover {
+    background: linear-gradient(to bottom, #ffd700, #c17f16);
+}
+
+/* Modal Body Background */
+.modal-body {
+    background: linear-gradient(to bottom, #472f1c, #2a1810);
+    color: #FFD700;
+    border-radius: 0 0 8px 8px;
+}
+
+.feature-content {
+    flex-grow: 1;
+    margin: 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.feature-creator {
+    font-size: 0.8em;
+    color: #472f1c;
+    font-family: 'MedievalSharp', cursive;
+    opacity: 0.8;
+    margin: 4px 0 0 0;
+    padding: 0;
+}
+
+/* Modal and container styling */
+.modal-body {
+    padding: 20px;
+}
+
+.feature-input {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make input and button exactly the same width */
+#newFeature,
+#submitFeature {
+    width: 288px; /* Match the submit button width */
+    box-sizing: border-box;
+}
+
+#newFeature {
+    background: linear-gradient(to bottom, #e6c78c, #d4af37);
+    border: 1px solid #daa520;
+    color: #472f1c;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 5px;
+    font-family: 'MedievalSharp', cursive;
+}
+
+#submitFeature {
+    background: linear-gradient(to bottom, #ffd700, #daa520);
+    border: 1px solid #daa520;
+    color: #472f1c;
+    font-family: 'MedievalSharp', cursive;
+    font-weight: bold;
+    padding: 8px 20px;
+    margin-top: 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+/* Reset and override all potential width constraints */
+.feature-input input[type="text"],
+#newFeature {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+    flex: none !important;
+    -webkit-box-flex: 0 !important;
+    box-sizing: border-box !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Ensure the container doesn't restrict width */
+.feature-input {
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+    display: block !important;
+}
+
+/* Keep submit button styling */
+#submitFeature {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    background: linear-gradient(to bottom, #ffd700, #daa520);
+    border: 1px solid #daa520;
+    color: #472f1c;
+    font-family: 'MedievalSharp', cursive;
+    font-weight: bold;
+    padding: 8px 20px;
+    margin-top: 10px;
+    border-radius: 5px;
+}

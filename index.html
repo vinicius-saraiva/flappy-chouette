@@ -6,6 +6,8 @@
     <title>Flappy Owl - Welcome</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -16,6 +18,10 @@
             <div id="announcement-content">
                 🎮 Sur ordinateur, utilisez la barre d'espace pour jouer !
             </div>
+        </div>
+
+        <div class="container mt-4">
+            <button id="featureRequestBtn" class="btn btn-primary">Ask / Vote for a Feature Idea</button>
         </div>
 
         <div class="countdown">
@@ -54,12 +60,26 @@
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="gold-bar" style="margin: 20px 0;">
-            <a href="https://github.com/vinicius-saraiva/flappy-chouette" target="_blank" class="github-link">GitHub</a>
-            <span class="footer-text" style="color: #FFD700;">- Les pull requests sont les bienvenues, n'hésitez pas à proposer vos améliorations !</span>
+    <div class="modal fade" id="featureModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Feature Requests</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="featureList" class="mb-4"></div>
+                    <div class="feature-input">
+                        <textarea id="newFeature" 
+                                  maxlength="120" 
+                                  placeholder="Your feature idea (max 120 chars)"
+                                  rows="2"></textarea>
+                        <button id="submitFeature">Submit</button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
 
     <script>
         // Initialize Supabase
@@ -299,6 +319,165 @@
                 console.error('Error:', error);
             }
         }
+
+        // Initialize feature modal functionality
+        let featureModal;
+
+        // Initialize userVotes from localStorage
+        const userVotes = new Map(
+            JSON.parse(localStorage.getItem('featureVotes') || '[]')
+        );
+
+        // Helper function to save votes to localStorage
+        function saveVotesToStorage() {
+            localStorage.setItem('featureVotes', JSON.stringify([...userVotes]));
+        }
+
+        async function loadFeatures() {
+            const { data: features, error } = await supabaseClient
+                .from('feature_requests')
+                .select('*')
+                .order('votes', { ascending: false });
+
+            if (error) {
+                console.error('Error loading features:', error);
+                return;
+            }
+
+            const featureList = document.getElementById('featureList');
+            featureList.innerHTML = '';
+
+            features.forEach(feature => {
+                const currentVote = userVotes.get(feature.id);
+                const featureElement = document.createElement('div');
+                featureElement.className = 'feature-item';
+                featureElement.setAttribute('data-feature-id', feature.id);
+                featureElement.innerHTML = `
+                    <div class="vote-buttons">
+                        <button class="btn btn-sm btn-outline-primary vote-up" 
+                                onclick="vote(${feature.id}, 1)"
+                                ${currentVote === 1 ? 'disabled' : ''}>
+                            ▲
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary vote-down" 
+                                onclick="vote(${feature.id}, -1)"
+                                ${currentVote === -1 ? 'disabled' : ''}>
+                            ▼
+                        </button>
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-text">${feature.feature_text}</div>
+                        <div class="feature-creator">by ${feature.created_by}</div>
+                    </div>
+                    <div class="vote-count">${feature.votes}</div>
+                `;
+                featureList.appendChild(featureElement);
+            });
+        }
+
+        async function vote(featureId, voteValue) {
+            const username = localStorage.getItem('username');
+            if (!username) {
+                alert('Please enter a username first!');
+                return;
+            }
+
+            // Check if user already voted the same way
+            const previousVote = userVotes.get(featureId);
+            if (previousVote === voteValue) {
+                alert('You have already voted this way!');
+                return;
+            }
+
+            try {
+                // Get current votes
+                const { data: feature, error: getError } = await supabaseClient
+                    .from('feature_requests')
+                    .select('votes')
+                    .eq('id', featureId)
+                    .single();
+
+                if (getError) throw getError;
+
+                let voteChange = voteValue;
+                // If changing vote, need to account for previous vote
+                if (previousVote) {
+                    voteChange = voteValue - previousVote; // This will be 2 or -2
+                }
+
+                // Update the vote count
+                const { error: updateError } = await supabaseClient
+                    .from('feature_requests')
+                    .update({ votes: feature.votes + voteChange })
+                    .eq('id', featureId);
+
+                if (updateError) throw updateError;
+
+                // Update local vote tracking and save to localStorage
+                userVotes.set(featureId, voteValue);
+                saveVotesToStorage();
+
+                // Update UI without refreshing
+                const voteCountElement = document.querySelector(`[data-feature-id="${featureId}"] .vote-count`);
+                const currentVotes = parseInt(voteCountElement.textContent);
+                voteCountElement.textContent = currentVotes + voteChange;
+
+                // Update button states
+                const upvoteButton = document.querySelector(`[data-feature-id="${featureId}"] .vote-up`);
+                const downvoteButton = document.querySelector(`[data-feature-id="${featureId}"] .vote-down`);
+                
+                upvoteButton.disabled = voteValue === 1;
+                downvoteButton.disabled = voteValue === -1;
+
+            } catch (error) {
+                console.error('Error voting:', error);
+                alert('Error while voting. Please try again.');
+            }
+        }
+
+        async function submitFeature() {
+            const input = document.getElementById('newFeature');
+            const featureText = input.value.trim();
+            const username = localStorage.getItem('username');
+
+            if (!featureText || !username) return;
+
+            const { error } = await supabaseClient
+                .from('feature_requests')
+                .insert({
+                    feature_text: featureText,
+                    created_by: username
+                });
+
+            if (error) {
+                console.error('Error submitting feature:', error);
+                return;
+            }
+
+            input.value = '';
+            loadFeatures();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize the modal
+            featureModal = new bootstrap.Modal(document.getElementById('featureModal'));
+            
+            // Add button click handler
+            document.getElementById('featureRequestBtn').addEventListener('click', () => {
+                loadFeatures();
+                featureModal.show();
+            });
+
+            // Add submit button handler
+            document.getElementById('submitFeature').addEventListener('click', submitFeature);
+
+            // Add input validation
+            document.getElementById('newFeature').addEventListener('input', (e) => {
+                if (e.target.value.length > 120) {
+                    e.target.value = e.target.value.slice(0, 120);
+                }
+            });
+        });
     </script>
 </body>
 </html>
