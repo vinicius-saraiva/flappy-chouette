@@ -600,7 +600,18 @@ button:hover {
     text-align: center;
 }
 
-/* Feature Request Button Styling */
+/* Feature Request Button Container */
+.feature-request-container {
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translateY(0);
+}
+
+.feature-title {
+    display: none; /* Hide the title since it's now a button in the corner */
+}
+
 #featureRequestBtn {
     background: linear-gradient(to bottom, #472f1c, #2a1810);
     border: 2px solid #daa520;
@@ -612,14 +623,38 @@ button:hover {
         inset 0 0 15px rgba(255, 215, 0, 0.2),
         0 2px 4px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
-    width: 80%;
-    max-width: 400px;
-    margin: 20px auto;
-    display: block;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 #featureRequestBtn:hover {
     background: linear-gradient(to bottom, #5a3b23, #3a2416);
+}
+
+#featureRequestBtn .button-text {
+    display: inline;
+}
+
+#featureRequestBtn .button-emoji {
+    display: none;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    #featureRequestBtn {
+        padding: 10px;
+        font-size: 20px;
+        width: auto;
+        min-width: 0;
+    }
+
+    #featureRequestBtn .button-text {
+        display: none;
+    }
+
+    #featureRequestBtn .button-emoji {
+        display: inline;
+    }
 }
 
 /* Modal Styling */
