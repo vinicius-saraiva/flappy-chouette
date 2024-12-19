@@ -17,15 +17,15 @@
 		capture_pageleave: false,
 		person_profiles: 'identified_only',
 		session_recording: {
-			enabled: true,
+			enabled: false,
 			maskAllInputs: false,
-			recordCanvas: false,
-			sampleRate: 2,
-			networkPayloadCapture: false
+			recordCanvas: true,
+			sampleRate: 1,
+			minimumDuration: 0
 		},
 		request_batching: true,
-		batch_size: 50,
-		flush_interval: 5000
+		batch_size: 100,
+		flush_interval: 10000
 	});
 </script>
 </head>

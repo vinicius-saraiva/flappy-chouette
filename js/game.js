@@ -112,6 +112,10 @@ game.States.menu = function(){
 
 game.States.play = {
 	create: function() {
+		// Start recording when game starts
+		if (window.posthog) {
+			posthog.startSessionRecording();
+		}
 		this.bg = game.add.tileSprite(0,0,game.width,game.height,'background');
 		this.pipeGroup = game.add.group();
 		this.pipeGroup.enableBody = true;
@@ -238,15 +242,15 @@ game.States.play = {
 		
 		const username = localStorage.getItem('username');
 		
-		// Make sure PostHog is defined before using it
 		if (window.posthog) {
+			// Capture the game completion
 			posthog.capture('game_completed', {
 				username: username,
 				score: this.score
 			});
 			
-			// Optionally identify the user if not already done
-			posthog.identify(username);
+			// Stop recording after capturing the score
+			posthog.stopSessionRecording();
 		}
 
 		this.stopGame();
@@ -405,6 +409,14 @@ game.States.play = {
 	// Add new method for restarting
 	restartGame: function() {
 		game.state.start('play');
+	},
+
+	shutdown: function() {
+		// Make sure recording stops if game state changes
+		if (window.posthog) {
+			posthog.stopSessionRecording();
+		}
+		// ... any other shutdown code ...
 	}
 }
 
