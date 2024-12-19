@@ -139,16 +139,14 @@
         // Update leaderboard function
         async function updateLeaderboard() {
             try {
-                // Modified query to get only the highest score per username
                 const { data: scores, error } = await supabaseClient
                     .from('scores')
                     .select('username, score')
                     .order('score', { ascending: false })
-                    .limit(1000) // Get a large initial set
+                    .limit(1000)
                     .then(response => {
                         if (response.error) throw response.error;
                         
-                        // Group by username and keep highest score
                         const uniqueScores = response.data.reduce((acc, current) => {
                             if (!acc[current.username] || acc[current.username].score < current.score) {
                                 acc[current.username] = current;
@@ -156,11 +154,10 @@
                             return acc;
                         }, {});
 
-                        // Convert back to array and sort
                         return {
                             data: Object.values(uniqueScores)
                                 .sort((a, b) => b.score - a.score)
-                                .slice(0, 15) // Keep top 15
+                                .slice(0, 15)
                         };
                     });
 
@@ -173,10 +170,19 @@
                     return;
                 }
 
-                // Clear any existing content
                 leaderboardList.innerHTML = '';
 
-                // Top 3 podium
+                // Estimate duration based on score with 5 second initial delay
+                const estimateDuration = (score) => {
+                    const initialDelay = 5; // 5 seconds before first point
+                    const secondsPerPoint = 0.89;  // (13 - 5) seconds / 9 points
+                    const estimatedSeconds = Math.round(initialDelay + (score * secondsPerPoint));
+                    const minutes = Math.floor(estimatedSeconds / 60);
+                    const seconds = estimatedSeconds % 60;
+                    return `(~${minutes}:${seconds.toString().padStart(2, '0')})`;
+                };
+
+                // Top 3 podium with estimated duration
                 const topThree = scores.slice(0, 3);
                 const podiumHTML = `
                     <div class="top-three">
@@ -184,7 +190,7 @@
                             <div class="podium-item podium-${index + 1}">
                                 <div class="podium-rank">#${index + 1}</div>
                                 <div class="podium-username">${entry.username}</div>
-                                <div class="podium-score">${entry.score}</div>
+                                <div class="podium-score">${entry.score} ${estimateDuration(entry.score)}</div>
                             </div>
                         `).join('')}
                     </div>
