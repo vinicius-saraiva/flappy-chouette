@@ -238,9 +238,6 @@ game.States.play = {
 		this.stopGame();
 		this.saveScore(this.score);
 		
-		// Fetch best score using username instead of userId
-		const username = localStorage.getItem('username');
-		
 		supabaseClient
 			.from('scores')
 			.select('score')
