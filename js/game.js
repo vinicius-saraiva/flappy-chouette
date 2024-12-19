@@ -38,6 +38,15 @@ game.States.boot = function(){
 		game.load.image('loading','assets/preloader.gif');
 	};
 	this.create = function(){
+		// Identify user when game starts
+		const username = localStorage.getItem('username');
+		if (username && window.posthog) {
+			posthog.identify(username, {
+				username: username,
+				$name: username
+			});
+		}
+		
 		game.state.start('preload'); //跳转到资源加载页面
 	};
 }
