@@ -15,6 +15,8 @@
 		autocapture: false,
 		capture_pageview: false,
 		capture_pageleave: false,
+		capture_performance: false,
+		disable_session_recording: true,
 		person_profiles: 'identified_only',
 		session_recording: {
 			enabled: false,
@@ -25,7 +27,12 @@
 		},
 		request_batching: true,
 		batch_size: 100,
-		flush_interval: 10000
+		flush_interval: 10000,
+		disable_performance_metrics: true,
+		respect_dnt: true,
+		disable_persistence: false,
+		disable_cookie: true,
+		disable_toolbar: true
 	});
 </script>
 </head>
@@ -36,7 +43,7 @@
 	window.baseUrl = window.location.origin;
 
 	function goHome() {
-		window.location.href = window.baseUrl;
+			window.location.href = window.baseUrl;
 	}
 
 	function checkAuth() {
