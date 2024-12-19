@@ -12,11 +12,20 @@
 
 	posthog.init('phc_CzCsR8kLTf58Wbn9QMIGvHzlXMfZJJHocnHoPwwTrac', {
 		api_host: 'https://eu.i.posthog.com',
+		autocapture: false,
+		capture_pageview: false,
+		capture_pageleave: false,
 		person_profiles: 'identified_only',
 		session_recording: {
 			enabled: true,
-			maskAllInputs: false
-		}
+			maskAllInputs: false,
+			recordCanvas: false,
+			sampleRate: 2,
+			networkPayloadCapture: false
+		},
+		request_batching: true,
+		batch_size: 50,
+		flush_interval: 5000
 	});
 </script>
 </head>
