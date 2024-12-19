@@ -229,11 +229,16 @@ game.States.play = {
 		
 		const username = localStorage.getItem('username');
 		
-		// Track only game completion with score
-		posthog.capture('game_completed', {
-			username: username,
-			score: this.score
-		});
+		// Make sure PostHog is defined before using it
+		if (window.posthog) {
+			posthog.capture('game_completed', {
+				username: username,
+				score: this.score
+			});
+			
+			// Optionally identify the user if not already done
+			posthog.identify(username);
+		}
 
 		this.stopGame();
 		this.saveScore(this.score);
