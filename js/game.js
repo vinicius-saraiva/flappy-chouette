@@ -225,8 +225,16 @@ game.States.play = {
 
 	gameOver: function() {
 		if (this.gameIsOver) return;
-		
 		this.gameIsOver = true;
+		
+		const username = localStorage.getItem('username');
+		
+		// Track only game completion with score
+		posthog.capture('game_completed', {
+			username: username,
+			score: this.score
+		});
+
 		this.stopGame();
 		this.saveScore(this.score);
 		
