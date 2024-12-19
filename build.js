@@ -32,12 +32,16 @@ const obfuscationResult = JavaScriptObfuscator.obfuscate(sourceCode, {
     shuffleStringArray: true,
     splitStrings: false,
     stringArray: true,
-    stringArrayEncoding: ['base64'],
-    stringArrayThreshold: 1,
-    transformObjectKeys: false
+    stringArrayEncoding: ['none'],
+    stringArrayThreshold: 0.8,
+    transformObjectKeys: false,
+    unicodeEscapeSequence: false
 });
 
-// Write the obfuscated code to a new file
-fs.writeFileSync('js/game.min.js', obfuscationResult.getObfuscatedCode());
+// Write the obfuscated code with proper file permissions
+fs.writeFileSync('js/game.min.js', obfuscationResult.getObfuscatedCode(), {
+    encoding: 'utf8',
+    mode: 0o644
+});
 
 console.log('Game code has been obfuscated successfully!'); 
