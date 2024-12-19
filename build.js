@@ -4,16 +4,16 @@ const fs = require('fs');
 // Read the source file
 const sourceCode = fs.readFileSync('js/game.js', 'utf8');
 
-// Enhanced name obfuscation while protecting Phaser framework
+// Simplified obfuscation settings for better compatibility
 const obfuscationResult = JavaScriptObfuscator.obfuscate(sourceCode, {
     compact: true,
     controlFlowFlattening: false,
     deadCodeInjection: false,
     debugProtection: false,
-    disableConsoleOutput: true,
-    identifierNamesGenerator: 'mangled',
-    identifiersPrefix: '_',
-    renameGlobals: true,
+    disableConsoleOutput: false,
+    identifierNamesGenerator: 'hexadecimal',
+    identifiersPrefix: '',
+    renameGlobals: false,
     renameProperties: false,
     reservedNames: [
         'Phaser',
@@ -27,21 +27,18 @@ const obfuscationResult = JavaScriptObfuscator.obfuscate(sourceCode, {
         'ARCADE',
         'Keyboard'
     ],
-    rotateStringArray: true,
+    rotateStringArray: false,
     selfDefending: false,
-    shuffleStringArray: true,
+    shuffleStringArray: false,
     splitStrings: false,
-    stringArray: true,
+    stringArray: false,
     stringArrayEncoding: ['none'],
-    stringArrayThreshold: 0.8,
+    stringArrayThreshold: 0,
     transformObjectKeys: false,
     unicodeEscapeSequence: false
 });
 
-// Write the obfuscated code with proper file permissions
-fs.writeFileSync('js/game.min.js', obfuscationResult.getObfuscatedCode(), {
-    encoding: 'utf8',
-    mode: 0o644
-});
+// Write the obfuscated code with explicit UTF-8 encoding
+fs.writeFileSync('js/game.min.js', obfuscationResult.getObfuscatedCode(), 'utf8');
 
 console.log('Game code has been obfuscated successfully!'); 
