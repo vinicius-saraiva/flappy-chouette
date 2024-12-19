@@ -681,18 +681,56 @@ button:hover {
 
 /* Vote Buttons Styling */
 .vote-buttons .btn {
-    background: linear-gradient(to bottom, #472f1c, #2a1810);
+    padding: 5px 10px;
+    background: #2a1810;
     border: 1px solid #daa520;
-    color: #FFD700;
-    padding: 2px 8px;
     margin: 0 2px;
     border-radius: 5px;
-    font-family: 'MedievalSharp', cursive;
     transition: all 0.3s ease;
+    font-size: 16px;
+    opacity: 1;
+    cursor: pointer;
 }
 
-.vote-buttons .btn:hover {
-    background: linear-gradient(to bottom, #5a3b23, #3a2416);
+/* Default state - both buttons enabled */
+.vote-buttons .btn:not(.active) {
+    background: #2a1810;
+    border-color: #daa520;
+    opacity: 0.8;
+}
+
+.vote-buttons .btn:not(.active):hover {
+    background: #3a2416;
+    opacity: 1;
+}
+
+/* Active upvote state */
+.vote-buttons .vote-up.active {
+    background: #2d5a1e;  /* Green background */
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px #4CAF50;
+}
+
+.vote-buttons .vote-up.active:hover {
+    background: #1e3c14;  /* Darker green on hover to indicate removal */
+}
+
+/* Active downvote state */
+.vote-buttons .vote-down.active {
+    background: #5a1e1e;  /* Red background */
+    border-color: #AF4C4C;
+    box-shadow: 0 0 5px #AF4C4C;
+}
+
+.vote-buttons .vote-down.active:hover {
+    background: #3c1414;  /* Darker red on hover to indicate removal */
+}
+
+/* Only disable upvote when downvote is active */
+.vote-buttons .vote-down.active ~ .vote-up {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* Feature Input Styling */
@@ -839,4 +877,11 @@ button:hover {
     padding: 8px 20px;
     margin-top: 10px;
     border-radius: 5px;
+}
+
+.thumb-icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    filter: brightness(0) saturate(100%) invert(83%) sepia(72%) saturate(401%) hue-rotate(358deg) brightness(101%) contrast(101%); /* Makes the icon gold colored */
 }

@@ -354,15 +354,13 @@
                 featureElement.setAttribute('data-feature-id', feature.id);
                 featureElement.innerHTML = `
                     <div class="vote-buttons">
-                        <button class="btn btn-sm btn-outline-primary vote-up" 
-                                onclick="vote(${feature.id}, 1)"
-                                ${currentVote === 1 ? 'disabled' : ''}>
-                            ▲
+                        <button class="btn btn-sm btn-outline-primary vote-up ${currentVote === 1 ? 'active' : ''}" 
+                                onclick="vote(${feature.id}, 1)">
+                            👍
                         </button>
-                        <button class="btn btn-sm btn-outline-primary vote-down" 
-                                onclick="vote(${feature.id}, -1)"
-                                ${currentVote === -1 ? 'disabled' : ''}>
-                            ▼
+                        <button class="btn btn-sm btn-outline-primary vote-down ${currentVote === -1 ? 'active' : ''}" 
+                                onclick="vote(${feature.id}, -1)">
+                            👎
                         </button>
                     </div>
                     <div class="feature-content">
@@ -382,15 +380,21 @@
                 return;
             }
 
-            // Check if user already voted the same way
             const previousVote = userVotes.get(featureId);
+            let voteChange;
+
+            // If clicking the same button again, remove the vote
             if (previousVote === voteValue) {
-                alert('You have already voted this way!');
-                return;
+                voteChange = -voteValue; // Reverse the previous vote
+                userVotes.delete(featureId); // Remove the vote from tracking
+            } else {
+                // If changing vote or voting for first time
+                voteChange = previousVote ? (voteValue - previousVote) : voteValue;
+                userVotes.set(featureId, voteValue);
             }
 
             try {
-                // Get current votes
+                // Update the vote count
                 const { data: feature, error: getError } = await supabaseClient
                     .from('feature_requests')
                     .select('votes')
@@ -399,13 +403,6 @@
 
                 if (getError) throw getError;
 
-                let voteChange = voteValue;
-                // If changing vote, need to account for previous vote
-                if (previousVote) {
-                    voteChange = voteValue - previousVote; // This will be 2 or -2
-                }
-
-                // Update the vote count
                 const { error: updateError } = await supabaseClient
                     .from('feature_requests')
                     .update({ votes: feature.votes + voteChange })
@@ -413,21 +410,44 @@
 
                 if (updateError) throw updateError;
 
-                // Update local vote tracking and save to localStorage
-                userVotes.set(featureId, voteValue);
+                // Save to localStorage
                 saveVotesToStorage();
 
-                // Update UI without refreshing
-                const voteCountElement = document.querySelector(`[data-feature-id="${featureId}"] .vote-count`);
-                const currentVotes = parseInt(voteCountElement.textContent);
-                voteCountElement.textContent = currentVotes + voteChange;
+                // Refresh the feature list to show new order
+                const { data: features, error: featuresError } = await supabaseClient
+                    .from('feature_requests')
+                    .select('*')
+                    .order('votes', { ascending: false });
 
-                // Update button states
-                const upvoteButton = document.querySelector(`[data-feature-id="${featureId}"] .vote-up`);
-                const downvoteButton = document.querySelector(`[data-feature-id="${featureId}"] .vote-down`);
-                
-                upvoteButton.disabled = voteValue === 1;
-                downvoteButton.disabled = voteValue === -1;
+                if (featuresError) throw featuresError;
+
+                const featureList = document.getElementById('featureList');
+                featureList.innerHTML = '';
+
+                features.forEach(feature => {
+                    const currentVote = userVotes.get(feature.id);
+                    const featureElement = document.createElement('div');
+                    featureElement.className = 'feature-item';
+                    featureElement.setAttribute('data-feature-id', feature.id);
+                    featureElement.innerHTML = `
+                        <div class="vote-buttons">
+                            <button class="btn btn-sm btn-outline-primary vote-up ${currentVote === 1 ? 'active' : ''}" 
+                                    onclick="vote(${feature.id}, 1)">
+                                👍
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary vote-down ${currentVote === -1 ? 'active' : ''}" 
+                                    onclick="vote(${feature.id}, -1)">
+                                👎
+                            </button>
+                        </div>
+                        <div class="feature-content">
+                            <div class="feature-text">${feature.feature_text}</div>
+                            <div class="feature-creator">by ${feature.created_by}</div>
+                        </div>
+                        <div class="vote-count">${feature.votes}</div>
+                    `;
+                    featureList.appendChild(featureElement);
+                });
 
             } catch (error) {
                 console.error('Error voting:', error);
