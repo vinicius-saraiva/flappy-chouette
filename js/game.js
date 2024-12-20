@@ -245,15 +245,29 @@ game.States.play = {
 		this.gameIsOver = true;
 		
 		const username = localStorage.getItem('username');
-		const gameDuration = this.gameStartTime ? Math.floor((Date.now() - this.gameStartTime) / 1000) : 0; // Duration in seconds
+		const gameDuration = this.gameStartTime ? Math.floor((Date.now() - this.gameStartTime) / 1000) : 0;
+		
+		// Debug info
+		console.log('Game Over triggered:', {
+			username: username,
+			score: this.score,
+			duration_seconds: gameDuration,
+			posthog_available: typeof posthog !== 'undefined'
+		});
 		
 		try {
 			if (typeof posthog !== 'undefined') {
+				// Force the event to be sent immediately
 				posthog.capture('game_completed', {
 					username: username,
 					score: this.score,
 					duration_seconds: gameDuration
+				}, {
+					send_instantly: true
 				});
+				console.log('PostHog event sent');
+			} else {
+				console.error('PostHog not available - event not sent');
 			}
 		} catch (e) {
 			console.error('PostHog error:', e);
@@ -378,7 +392,7 @@ game.States.play = {
 		this.pipeGroup.setAll('body.velocity.x', -this.gameSpeed);
 	},
 
-	resetPipe: function(topPipeY,bottomPipeY){//重置���了边界的管道，做到利用
+	resetPipe: function(topPipeY,bottomPipeY){//重置了边界的管道，做到利用
 		var i = 0;
 		const startX = game.isDesktop ? game.width : game.width;
 		
