@@ -199,7 +199,7 @@ class ChampionshipPopup {
                     <div class="champion-score">${top3[0].score} points</div>
                     <div class="champion-date">${this.formatDate(top3[0].created_at)}</div>
                     <div class="champion-duration">${this.formatDuration(top3[0].score)}</div>
-                    <div class="champion-quote">"La Chouette m'a appris à toujours gagner"</div>
+                    <div class="champion-quote">"La chouette de Minerve ne prend son envol qu'à la tombée du jour"</div>
                 `;
             }
 
