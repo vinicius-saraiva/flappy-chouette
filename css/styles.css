@@ -920,3 +920,88 @@ button:hover {
     vertical-align: middle;
     filter: brightness(0) saturate(100%) invert(83%) sepia(72%) saturate(401%) hue-rotate(358deg) brightness(101%) contrast(101%); /* Makes the icon gold colored */
 }
+
+.newsletter-signup {
+    margin-top: 20px;
+    text-align: center;
+    padding: 20px;
+    background: rgba(71, 47, 28, 0.9);
+    border: 2px solid #daa520;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(218, 165, 32, 0.3);
+}
+
+.newsletter-title {
+    color: #daa520;
+    font-family: 'MedievalSharp', cursive;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.newsletter-text {
+    color: #daa520;
+    font-family: 'MedievalSharp', cursive;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.signup-form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.email-input {
+    padding: 8px 15px;
+    border: 2px solid #daa520;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #daa520;
+    font-family: 'MedievalSharp', cursive;
+    width: 250px;
+    font-size: 1em;
+}
+
+.email-input::placeholder {
+    color: rgba(218, 165, 32, 0.6);
+}
+
+.subscribe-button {
+    padding: 8px 20px;
+    background: linear-gradient(to bottom, #daa520, #b8860b);
+    border: 2px solid #ffd700;
+    border-radius: 5px;
+    color: #472f1c;
+    font-family: 'MedievalSharp', cursive;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1em;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.subscribe-button:hover {
+    background: linear-gradient(to bottom, #ffd700, #daa520);
+    transform: scale(1.05);
+}
+
+.subscribe-button:active {
+    transform: scale(0.95);
+}
+
+.subscribe-message {
+    color: #daa520;
+    font-family: 'MedievalSharp', cursive;
+    margin-top: 10px;
+    min-height: 20px;
+}
+
+.subscribe-message.error {
+    color: #ff6b6b;
+}
+
+.subscribe-message.success {
+    color: #4CAF50;
+}
