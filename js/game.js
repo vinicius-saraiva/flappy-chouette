@@ -156,6 +156,8 @@ game.States.play = {
 		game.input.onDown.addOnce(this.statrGame, this);
 		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 		this.spaceKey.onDown.addOnce(this.statrGame, this);
+
+		this.gameStartTime = null;  // Will be set when game actually starts
 	},
 
 	update: function() {
@@ -199,6 +201,8 @@ game.States.play = {
 		this.spaceKey.onDown.add(this.fly, this);
 
 		game.time.events.start();
+
+		this.gameStartTime = Date.now();  // Record when game actually starts
 	},
 
 	stopGame: function() {
@@ -241,16 +245,18 @@ game.States.play = {
 		this.gameIsOver = true;
 		
 		const username = localStorage.getItem('username');
+		const gameDuration = this.gameStartTime ? Math.floor((Date.now() - this.gameStartTime) / 1000) : 0; // Duration in seconds
 		
-		if (window.posthog) {
-			// Capture the game completion
-			posthog.capture('game_completed', {
-				username: username,
-				score: this.score
-			});
-			
-			// Stop recording after capturing the score
-			posthog.stopSessionRecording();
+		try {
+			if (typeof posthog !== 'undefined') {
+				posthog.capture('game_completed', {
+					username: username,
+					score: this.score,
+					duration_seconds: gameDuration
+				});
+			}
+		} catch (e) {
+			console.error('PostHog error:', e);
 		}
 
 		this.stopGame();
@@ -372,7 +378,7 @@ game.States.play = {
 		this.pipeGroup.setAll('body.velocity.x', -this.gameSpeed);
 	},
 
-	resetPipe: function(topPipeY,bottomPipeY){//重置出了边界的管道，做到利用
+	resetPipe: function(topPipeY,bottomPipeY){//重置���了边界的管道，做到利用
 		var i = 0;
 		const startX = game.isDesktop ? game.width : game.width;
 		
